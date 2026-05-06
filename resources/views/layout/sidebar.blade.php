@@ -1,13 +1,17 @@
 <div class="flex">
     <aside id="sidebar"
-        class="font-poppins fixed inset-y-0 my-6 ml-4 w-full max-w-72 md:max-w-60 xl:max-w-64 2xl:max-w-64 z-50 rounded-xl bg-white shadow-2xl overflow-y-scroll transform transition-transform duration-300 -translate-x-full md:translate-x-0 ease-in-out">
+        class="font-poppins fixed inset-y-0 my-6 ml-4 w-full max-w-72 md:max-w-60 xl:max-w-64 2xl:max-w-64 z-50 rounded-lg bg-white overflow-y-auto transform transition-transform duration-300 -translate-x-full md:translate-x-0 ease-in-out shadow-xl">
         <div class="p-2">
             <div class="p-4">
-                <a class="text-center" href="{{ route('dashboard') }}">
-                    <img class="w-24 h-12 mx-auto" src="{{ asset('/beil.svg') }}" alt="">
+                <a href="{{ route('dashboard') }}">
+                    <div class="w-32 md:w-28 xl:w-32 2xl:w-32 h-auto flex items-center mx-auto">
+                        <img src="{{ asset('logo.png') }}" alt="Logo" class="w-full h-auto object-contain">
+                    </div>
                 </a>
             </div>
-            <hr class="mx-5 shadow-2xl text-gray-300" />
+
+            <hr class="mx-5 shadow-2xl text-gray-100 rounded-xl" />
+
             <div>
                 <ul class="">
                     <li class="p-4 mx-2">
@@ -17,7 +21,8 @@
                                     <i class="material-icons text-white">home</i>
                                 </div>
                                 <div class="my-auto">
-                                    <h1 class="text-gray-500 hover:text-black text-base font-normal">Dashboard</h1>
+                                    <h1 class="text-gray-500 hover:text-black text-base font-normal">Dashboard
+                                    </h1>
                                 </div>
                             </div>
                         </a>
@@ -37,14 +42,14 @@
                     <li class="p-4 mx-2">
                         <div class="flex space-x-4">
                             <div class="bg-red-600 p-2 rounded-xl">
-                                <i class="material-icons text-white">settings</i>
+                            <i class="material-icons text-white">dataset</i>
                             </div>
                             <div class="my-auto">
-                                <h1 class="text-black text-base font-normal">Manage</h1>
+                                <h1 class="text-black text-base font-normal">Operational</h1>
                             </div>
                         </div>
                     </li>
-                    <hr class="mx-5 shadow-2xl text-gray-300" />
+            <hr class="mx-5 shadow-2xl text-gray-100 rounded-xl" />
                     <li class="p-4 mx-2">
                         <div class="ml-16 md:ml-14">
                             <a href="{{ route('category') }}">
@@ -62,14 +67,16 @@
                     <li class="p-4 mx-2">
                         <div class="ml-16 md:ml-14">
                             <a href="{{ route('invent') }}">
-                                <h1 class="text-gray-500 hover:text-black text-base font-normal">Master Ingridient</h1>
+                                <h1 class="text-gray-500 hover:text-black text-base font-normal">Master
+                                    Ingridient</h1>
                             </a>
                         </div>
                     </li>
                     <li class="p-4 mx-2">
                         <div class="ml-16 md:ml-14">
                             <a href="{{ route('stock') }}">
-                                <h1 class="text-gray-500 hover:text-black text-base font-normal">Stock Ingridient</h1>
+                                <h1 class="text-gray-500 hover:text-black text-base font-normal">Stock
+                                    Ingridient</h1>
                             </a>
                         </div>
                     </li>
@@ -115,7 +122,7 @@
                             </a>
                         </div>
                     </li>
-                    <hr class="mx-5 shadow-2xl text-gray-300" />
+                    <hr class="mx-5 shadow-2xl text-gray-100 rounded-xl" />
                     <li class="p-4 mx-2">
                         <a class="" href="{{ route('bot') }}">
                             <div class="flex space-x-4">
@@ -123,7 +130,40 @@
                                     <i class="material-icons text-white">support_agent</i>
                                 </div>
                                 <div class="my-auto">
-                                    <h1 class="text-gray-500 hover:text-black text-base font-normal">Support</h1>
+                                    <h1 class="text-gray-500 hover:text-black text-base font-normal">Support
+                                    </h1>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Logs -->
+                    <li class="p-4 mx-2">
+                        <a href="">
+                            <div class="flex space-x-4">
+                                <div class="bg-red-600 p-2 rounded-xl">
+                                    <i class="material-icons text-white">history</i>
+                                </div>
+                                <div class="my-auto">
+                                    <h1 class="text-gray-500 hover:text-black text-base font-normal">
+                                        Log Aktivitas
+                                    </h1>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Setting -->
+                    <li class="p-4 mx-2">
+                        <a href="">
+                            <div class="flex space-x-4">
+                                <div class="bg-red-600 p-2 rounded-xl">
+                                    <i class="material-icons text-white">settings</i>
+                                </div>
+                                <div class="my-auto">
+                                    <h1 class="text-gray-500 hover:text-black text-base font-normal">
+                                        Pengaturan
+                                    </h1>
                                 </div>
                             </div>
                         </a>

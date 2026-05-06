@@ -27,7 +27,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $request->session()->put('session_started_at', now());
 
-            return redirect()->route('user-home');
+            return redirect()->route('user-home')->with('toast_success', 'Login Berhasil!');
         }
 
         $request->validate([
@@ -46,7 +46,7 @@ class AuthController extends Controller
             return redirect()->route('user-home');
         }
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('toast_success', 'Login Berhasil!');
     }
 
     public function logout(Request $request)
