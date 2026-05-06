@@ -37,7 +37,7 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-tags text-red-500"></i> Master Bahan
+                        <i class="fas fa-tags text-red-500"></i> Master Ingridient
                     </h1>
                     <p class="text-sm text-gray-500">Definisi jenis bahan / SKU. Untuk operasi stok masuk &amp; opname,
                         buka menu <strong>Stok Bahan</strong>.</p>
@@ -125,7 +125,7 @@
                 <i class="fas fa-times text-xl"></i>
             </button>
             <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-tags text-red-500"></i> Tambah Bahan
+                <i class="fas fa-tags text-red-500"></i> Add
             </h2>
 
             <form id="addForm" method="post" action="{{ route('postinvent') }}" class="space-y-5">

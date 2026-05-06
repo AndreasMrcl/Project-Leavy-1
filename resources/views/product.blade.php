@@ -105,6 +105,7 @@
                                                 <button
                                                     class="editBtn w-9 h-9 flex items-center justify-center bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 hover:scale-105 transition"
                                                     data-id="{{ $menu->id }}" data-name="{{ $menu->name }}"
+                                                    data-price="{{ $menu->price }}" data-category_id="{{ $menu->category_id }}"
                                                     data-desc="{{ $menu->description }}" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
@@ -239,6 +240,37 @@
 
                 <div class="">
                     <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Price</label>
+                        <input type="text" id="editPriceInput" name="price"
+                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
+                            placeholder="Rp 0" required>
+                    </div>
+                </div>
+
+                <div class="">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+                        <select name="category_id" id="editCategory"
+                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
+                            required>
+                            <option value="">Select Category</option>
+                            @foreach ($category as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Img</label>
+                        <input type="file" name="img"
+                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="">
+                    <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
                         <textarea type="text" id="editDesc" name="desc"
                             class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
@@ -283,10 +315,19 @@
                 $(this).val(formatRupiah($(this).val()));
             });
 
+            $('#editPriceInput').on('keyup', function () {
+                $(this).val(formatRupiah($(this).val()));
+            });
+
             // Convert Rupiah to number before submit
             $('#addForm').on('submit', function () {
                 var priceValue = $('#priceInput').val().replace(/[^,\d]/g, '');
                 $('#priceInput').val(priceValue);
+            });
+
+            $('#editForm').on('submit', function () {
+                var priceValue = $('#editPriceInput').val().replace(/[^,\d]/g, '');
+                $('#editPriceInput').val(priceValue);
             });
 
             // Init DataTable for each category table
@@ -305,6 +346,8 @@
             $(document).on('click', '.editBtn', function () {
                 const btn = $(this);
                 $('#editName').val(btn.data('name'));
+                $('#editPriceInput').val('Rp ' + btn.data('price').toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                $('#editCategory').val(btn.data('category_id'));
                 $('#editDesc').val(btn.data('desc'));
 
                 $('#editForm').attr('action', `/product/${btn.data('id')}/update`);

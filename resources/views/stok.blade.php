@@ -37,13 +37,13 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-boxes text-green-600"></i> Stok Bahan
+                        <i class="fas fa-tags text-red-500"></i> Stock Ingridient
                     </h1>
                     <p class="text-sm text-gray-500">Pantau jumlah stok &amp; lakukan penerimaan / opname.
                         Untuk tambah / edit jenis bahan, buka menu <strong>Master Bahan</strong>.</p>
                 </div>
                 <button id="opnameBtn"
-                    class="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition font-semibold flex items-center gap-2">
+                    class="px-10 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition font-semibold flex items-center gap-2">
                     <i class="fas fa-clipboard-check"></i> Stock Opname
                 </button>
             </div>
@@ -106,11 +106,11 @@
                                     <td class="p-4">
                                         <div class="flex justify-center items-center gap-2">
                                             <button
-                                                class="receiveBtn px-3 h-9 flex items-center justify-center gap-1 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 hover:scale-105 transition text-sm font-semibold"
+                                                class="receiveBtn w-9 h-9 flex items-center justify-center bg-green-500 text-white rounded-lg shadow hover:bg-green-600 hover:scale-105 transition"
                                                 data-id="{{ $item->id }}" data-name="{{ $item->name }}"
                                                 data-stock="{{ $item->stock }}" data-unit="{{ $item->unit }}"
                                                 title="Terima Bahan">
-                                                <i class="fas fa-truck-loading"></i> Terima
+                                                <i class="fas fa-truck-loading"></i> 
                                             </button>
                                         </div>
                                     </td>
