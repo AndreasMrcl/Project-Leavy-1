@@ -1,0 +1,17 @@
+{
+    "agents": [
+        "copilot"
+    ],
+    "guidelines": true,
+    "herd_mcp": false,
+    "mcp": true,
+    "nightwatch_mcp": false,
+    "packages": [
+        "prism-php/prism"
+    ],
+    "sail": false,
+    "skills": [
+        "tailwindcss-development",
+        "developing-with-prism"
+    ]
+}
