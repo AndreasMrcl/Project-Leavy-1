@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\InsufficientStockException;
+use App\Models\ActivityLog;
 use App\Models\Cart;
 use App\Models\Discount;
 use App\Models\History;
@@ -10,6 +11,7 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
@@ -152,7 +154,7 @@ class OrderController extends Controller
         $activeShift = $user->settlements()->active()->first();
 
         if (! $activeShift) {
-            return redirect()->route('addorder')->with('error', 'Buka shift dulu sebelum menerima pembayaran.');
+            return redirect()->route('addorder')->with('error', 'Please open a shift before accepting payment.');
         }
 
         $cart = null;
@@ -178,7 +180,7 @@ class OrderController extends Controller
         if ($data['payment_method'] === 'cash' && ($data['cash_received'] ?? 0) < $cart->total_amount) {
             $redirectRoute = $cart->is_open_bill ? route('order') : route('addorder');
 
-            return redirect($redirectRoute)->with('error', 'Uang diterima kurang dari total order.');
+            return redirect($redirectRoute)->with('error', 'Cash received is less than the total order amount.');
         }
 
         // Online (Midtrans) → create pending order, generate snap, render Snap UI view
@@ -223,6 +225,12 @@ class OrderController extends Controller
                 return $order;
             });
 
+            $this->logActivity(
+                'Checkout Order',
+                "Checkout order {$order->no_order} via {$order->payment_type} (Total: Rp ".number_format($cart->total_amount, 0, ',', '.').')',
+                $userStore->id
+            );
+
             return redirect()->route('order')->with('orderSuccess', [
                 'id' => $order->id,
                 'no_order' => $order->no_order,
@@ -248,12 +256,12 @@ class OrderController extends Controller
 
         $chair = $userStore->chairs()->where('id', $data['chair_id'])->first();
         if (! $chair) {
-            return redirect()->route('addorder')->with('error', 'Meja tidak valid.');
+            return redirect()->route('addorder')->with('error', 'Chair is not valid.');
         }
 
         $existingOpenBill = Cart::openBills()->where('chair_id', $chair->id)->exists();
         if ($existingOpenBill) {
-            return redirect()->route('addorder')->with('error', 'Meja '.$chair->name.' sudah punya tagihan terbuka.');
+            return redirect()->route('addorder')->with('error', 'Chair '.$chair->name.' already has an open bill.');
         }
 
         $cart = ! empty($data['cart_id'])
@@ -261,11 +269,11 @@ class OrderController extends Controller
             : $user->carts()->where('is_open_bill', false)->latest()->first();
 
         if (! $cart || $cart->cartMenus()->count() === 0) {
-            return redirect()->route('addorder')->with('error', 'Keranjang masih kosong, tidak bisa buka bill.');
+            return redirect()->route('addorder')->with('error', 'Cart is still empty, cannot open a bill.');
         }
 
         if ($cart->orders()->exists()) {
-            return redirect()->route('addorder')->with('error', 'Cart ini sudah punya order, tidak bisa dibuka sebagai bill.');
+            return redirect()->route('addorder')->with('error', 'Cart this already has an order, cannot be opened as a bill.');
         }
 
         DB::transaction(function () use ($cart, $chair, $user, $userStore) {
@@ -282,7 +290,13 @@ class OrderController extends Controller
             ]);
         });
 
-        return redirect()->route('order')->with('success', 'Bill meja '.$chair->name.' berhasil dibuka.');
+        $this->logActivity(
+            'Open Bill',
+            "Opening bill for chair: {$chair->name}",
+            $userStore->id
+        );
+
+        return redirect()->route('order')->with('success', 'Bill for chair '.$chair->name.' successfully opened.');
     }
 
     public function cancelOpenBill($cartId)
@@ -296,8 +310,10 @@ class OrderController extends Controller
             ->first();
 
         if (! $cart) {
-            return redirect()->route('order')->with('error', 'Open bill tidak ditemukan.');
+            return redirect()->route('order')->with('error', 'Open bill not found.');
         }
+
+        $cartChairName = $cart->chair?->name ?? 'unknown';
 
         DB::transaction(function () use ($cart) {
             $cart->cartMenus()->delete();
@@ -305,7 +321,13 @@ class OrderController extends Controller
             $cart->delete();
         });
 
-        return redirect()->route('order')->with('success', 'Open bill dibatalkan.');
+        $this->logActivity(
+            'Cancel Open Bill',
+            "Canceling open bill for chair: {$cartChairName}",
+            $userStore->id
+        );
+
+        return redirect()->route('order')->with('success', 'Open bill canceled.');
     }
 
     private function initOnlinePayment(Cart $cart, $userStore)
@@ -360,7 +382,7 @@ class OrderController extends Controller
         $order = Order::find($orderId);
 
         if (! $order) {
-            return redirect()->route('order')->with('error', 'Order tidak ditemukan.');
+            return redirect()->route('order')->with('error', 'Order not found.');
         }
 
         $user = auth()->user();
@@ -374,12 +396,12 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('order')->with(
                 'error',
-                'Pembayaran belum diselesaikan di Midtrans. Gunakan tombol Lanjutkan Pembayaran di tabel order untuk membuka kembali halaman pembayaran.'
+                'Payment not yet completed at Midtrans. Use the Continue Payment button in the order table to reopen the payment page.'
             );
         }
 
         if ($status->transaction_status !== 'settlement' && $status->transaction_status !== 'capture') {
-            return redirect()->route('order')->with('error', 'Pembayaran belum berhasil. Status: '.$status->transaction_status);
+            return redirect()->route('order')->with('error', 'Payment not successful. Status: '.$status->transaction_status);
         }
 
         try {
@@ -406,7 +428,7 @@ class OrderController extends Controller
                 'change' => null,
             ]);
         } catch (\Exception $e) {
-            return redirect()->route('order')->with('error', 'Gagal konfirmasi: '.$e->getMessage());
+            return redirect()->route('order')->with('error', 'Failed to confirm: '.$e->getMessage());
         }
     }
 
@@ -415,7 +437,7 @@ class OrderController extends Controller
         $order = Order::with('cart.cartMenus.menu')->find($id);
 
         if (! $order || $order->payment_type !== 'online' || ! in_array($order->status, [null, 'pending'], true)) {
-            return redirect()->route('order')->with('error', 'Order tidak valid untuk dilanjutkan pembayaran.');
+            return redirect()->route('order')->with('error', 'Invalid order for continuing payment.');
         }
 
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
@@ -464,12 +486,15 @@ class OrderController extends Controller
         $order = Order::find($orderId);
 
         $user = auth()->user();
+        $userStore = $user->store;
 
         $settlement = $user->settlements()->active()->first();
 
         if (! $settlement) {
-            return redirect()->back()->with('error', 'Buka shift dulu sebelum mengarsipkan order.');
+            return redirect()->back()->with('error', 'Please open a shift before archiving an order.');
         }
+
+        $orderNo = $order->no_order;
 
         DB::transaction(function () use ($order, $settlement) {
             $history = new History;
@@ -510,6 +535,12 @@ class OrderController extends Controller
             $order->delete();
         });
 
+        $this->logActivity(
+            'Archive Order',
+            "Archiving order: {$orderNo}",
+            $userStore->id
+        );
+
         return redirect()->back()->with('success', 'Order archived successfully');
     }
 
@@ -521,11 +552,33 @@ class OrderController extends Controller
             return redirect(route('order'))->with('error', 'Order tidak ditemukan.');
         }
 
+        $userStore = auth()->user()->store;
+        $orderNo = $order->no_order;
+
         DB::transaction(function () use ($order) {
             app(InventoryService::class)->restoreForOrder($order);
             $order->delete();
         });
 
+        $this->logActivity(
+            'Delete Order',
+            "Deleting order: {$orderNo}",
+            $userStore->id
+        );
+
         return redirect(route('order'))->with('success', 'Order Berhasil Dihapus !');
+    }
+
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
     }
 }

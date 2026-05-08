@@ -23,6 +23,7 @@
             border-bottom: 1px solid #e5e7eb;
         }
     </style>
+    
 </head>
 
 <body class="bg-gray-50 font-sans">
@@ -51,6 +52,24 @@
             <!-- Table Section -->
             <div class="w-full bg-white rounded-xl shadow-md border border-gray-100">
                 <div class="p-5 overflow-auto">
+
+                    @if ($invents->isEmpty())
+                    
+                        <!-- Empty State -->
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <div class="text-gray-400 mb-4">
+                                <i class="fas fa-inbox text-6xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-600 mb-2">No master ingredients yet</h3>
+                            <p class="text-gray-500 mb-6">Get started by creating your first master ingredient</p>
+                            <button id="emptyAddBtn" aria-label="Add first master ingredient"
+                                class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold flex items-center gap-2">
+                                <i class="fas fa-plus"></i> Create Master
+                            </button>
+                        </div>
+
+                    @else
+
                     <table id="myTable" class="w-full text-left">
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
@@ -112,177 +131,27 @@
                             @endforeach
                         </tbody>
                     </table>
+                    @endif
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- ADD MODAL -->
-    <div id="addModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeAddModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-tags text-red-500"></i> Add
-            </h2>
-
-            <form id="addForm" method="post" action="{{ route('postinvent') }}" class="space-y-5">
-                @csrf @method('post')
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Bahan</label>
-                    <input type="text" name="name" placeholder="Mis: Susu UHT 1L"
-                        class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500"
-                        required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Unit</label>
-                    <select name="unit"
-                        class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500"
-                        required>
-                        <option value="" disabled selected>Pilih Unit</option>
-                        <option value="pcs">Pcs</option>
-                        <option value="kg">Kg</option>
-                        <option value="g">Gram</option>
-                        <option value="mg">Miligram</option>
-                        <option value="liter">Liter</option>
-                        <option value="ml">Mililiter</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Min Stock
-                        <span class="text-gray-400 text-xs">(opsional, alert kalau stok di bawah ini)</span>
-                    </label>
-                    <input type="number" name="min_stock" min="0" value="0"
-                        class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Initial Stock
-                        <span class="text-gray-400 text-xs">(opsional, kalau diisi akan tercatat sebagai
-                            penerimaan pertama)</span>
-                    </label>
-                    <input type="number" name="initial_stock" min="0" value="0"
-                        class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500">
-                </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-check"></i> Simpan
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- EDIT MODAL -->
-    <div id="editModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-edit text-blue-600"></i> Edit Bahan
-            </h2>
-            <p class="text-xs text-gray-500 mb-4">Untuk koreksi jumlah stok, gunakan menu <strong>Stok Bahan</strong>
-                &rarr; Stock Opname.</p>
-
-            <form id="editForm" method="post" class="space-y-5">
-                @csrf @method('put')
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Bahan</label>
-                    <input type="text" id="editName" name="name"
-                        class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                        required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Unit</label>
-                    <select id="editUnit" name="unit"
-                        class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                        required>
-                        <option value="" disabled>Pilih Unit</option>
-                        <option value="pcs">Pcs</option>
-                        <option value="kg">Kg</option>
-                        <option value="g">Gram</option>
-                        <option value="mg">Miligram</option>
-                        <option value="liter">Liter</option>
-                        <option value="ml">Mililiter</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Min Stock
-                        <span class="text-gray-400 text-xs">(opsional)</span>
-                    </label>
-                    <input type="number" id="editMinStock" name="min_stock" min="0"
-                        class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-save"></i> Perbarui
-                </button>
-            </form>
-        </div>
-    </div>
 
     <!-- SCRIPTS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            new DataTable('#myTable', {});
 
-            const addModal = $('#addModal');
-            const editModal = $('#editModal');
+    <script src="{{ asset('modal/mast.js') }}"></script>
 
-            $('#addBtn').click(() => addModal.removeClass('hidden'));
-            $('#closeAddModal').click(() => addModal.addClass('hidden'));
+    <!-- Modals -->
+    @include('modal.addMaster')
 
-            $(document).on('click', '.editBtn', function () {
-                const btn = $(this);
-                $('#editName').val(btn.data('name'));
-                $('#editMinStock').val(btn.data('min-stock'));
-                $('#editUnit').val(btn.data('unit'));
-
-                $('#editForm').attr('action', `/invent/${btn.data('id')}/update`);
-                editModal.removeClass('hidden');
-            });
-
-            $('#closeModal').click(() => editModal.addClass('hidden'));
-
-            $(window).click((e) => {
-                if (e.target === addModal[0]) addModal.addClass('hidden');
-                if (e.target === editModal[0]) editModal.addClass('hidden');
-            });
-
-            $(document).on('click', '.delete-confirm', function (e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Hapus bahan ini?',
-                    text: "Data dan riwayat stok akan dihapus permanen.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Hapus',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) form.submit();
-                });
-            });
-        });
-    </script>
+    @include('modal.editMaster')
 
     @include('sweetalert::alert')
+
     @include('layout.loading')
 
 </body>

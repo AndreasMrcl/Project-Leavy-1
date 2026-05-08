@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <title>Discount</title>
     @include('layout.head')
     <!-- DataTables CSS -->
@@ -25,6 +26,7 @@
             border-bottom: 1px solid #e5e7eb;
         }
     </style>
+    
 </head>
 
 <body class="bg-gray-50 font-sans">

@@ -139,14 +139,14 @@
 
                     <!-- Logs -->
                     <li class="p-4 mx-2">
-                        <a href="">
+                        <a href="{{ route('activityLog') }}">
                             <div class="flex space-x-4">
                                 <div class="bg-red-600 p-2 rounded-xl">
                                     <i class="material-icons text-white">history</i>
                                 </div>
                                 <div class="my-auto">
                                     <h1 class="text-gray-500 hover:text-black text-base font-normal">
-                                        Log Aktivitas
+                                        Log Activity
                                     </h1>
                                 </div>
                             </div>
@@ -155,14 +155,14 @@
 
                     <!-- Setting -->
                     <li class="p-4 mx-2">
-                        <a href="">
+                        <a href="{{ route('storeConfig') }}">
                             <div class="flex space-x-4">
                                 <div class="bg-red-600 p-2 rounded-xl">
                                     <i class="material-icons text-white">settings</i>
                                 </div>
                                 <div class="my-auto">
                                     <h1 class="text-gray-500 hover:text-black text-base font-normal">
-                                        Pengaturan
+                                        Settings
                                     </h1>
                                 </div>
                             </div>

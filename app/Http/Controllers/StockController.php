@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Invent;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
@@ -51,9 +52,28 @@ class StockController extends Controller
             ]);
         });
 
+        $this->logActivity(
+            'Stock Receive',
+            "Receiving stock {$invent->name}: +{$data['quantity']} {$invent->unit}",
+            $userStore->id
+        );
+
         $this->clearCache($userStore->id);
 
-        return redirect(route('stock'))->with('success', "Penerimaan {$data['quantity']} {$invent->unit} {$invent->name} berhasil dicatat!");
+        return redirect(route('stock'))->with('success', "Receiving {$data['quantity']} {$invent->unit} {$invent->name} successful!");
+    }
+
+    public function opnameForm()
+    {
+        $userStore = Auth::user()->store;
+
+        $cacheKey = "stock_{$userStore->id}";
+
+        $invents = Cache::remember($cacheKey, 180, function () use ($userStore) {
+            return $userStore->invents()->orderBy('name')->get();
+        });
+
+        return view('opname', compact('invents'));
     }
 
     public function opname(Request $request)
@@ -61,46 +81,90 @@ class StockController extends Controller
         $userStore = Auth::user()->store;
 
         $data = $request->validate([
-            'invent_id' => 'required|exists:invents,id',
-            'actual_stock' => 'required|integer|min:0',
             'reason' => 'required|string|max:255',
+            'items' => 'required|array|min:1',
+            'items.*.invent_id' => 'required|exists:invents,id',
+            'items.*.actual_stock' => 'nullable|integer|min:0',
         ]);
 
-        $invent = Invent::where('id', $data['invent_id'])
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $invents = Invent::where('store_id', $userStore->id)
+            ->whereIn('id', collect($data['items'])->pluck('invent_id'))
+            ->get()
+            ->keyBy('id');
 
-        $delta = $data['actual_stock'] - $invent->stock;
+        $changes = [];
+        foreach ($data['items'] as $row) {
+            if (! isset($row['actual_stock']) || $row['actual_stock'] === null || $row['actual_stock'] === '') {
+                continue;
+            }
 
-        if ($delta === 0) {
-            return redirect(route('stock'))->with('info', "Stok {$invent->name} sudah sesuai, tidak ada perubahan.");
+            $invent = $invents->get($row['invent_id']);
+            if (! $invent) {
+                continue;
+            }
+
+            $delta = (int) $row['actual_stock'] - $invent->stock;
+            if ($delta === 0) {
+                continue;
+            }
+
+            $changes[] = [
+                'invent' => $invent,
+                'actual_stock' => (int) $row['actual_stock'],
+                'delta' => $delta,
+            ];
         }
 
-        DB::transaction(function () use ($invent, $data, $delta, $userStore) {
-            $invent->update(['stock' => $data['actual_stock']]);
+        if (empty($changes)) {
+            return redirect(route('stock'))->with('info', 'No stock changes detected, nothing to adjust.');
+        }
 
-            StockMovement::create([
-                'store_id' => $userStore->id,
-                'invent_id' => $invent->id,
-                'user_id' => Auth::id(),
-                'quantity' => $delta,
-                'type' => 'manual_adjust',
-                'notes' => $data['reason'],
-            ]);
+        DB::transaction(function () use ($changes, $data, $userStore) {
+            foreach ($changes as $change) {
+                $change['invent']->update(['stock' => $change['actual_stock']]);
+
+                StockMovement::create([
+                    'store_id' => $userStore->id,
+                    'invent_id' => $change['invent']->id,
+                    'user_id' => Auth::id(),
+                    'quantity' => $change['delta'],
+                    'type' => 'manual_adjust',
+                    'notes' => $data['reason'],
+                ]);
+            }
         });
+
+        $totalUp = collect($changes)->where('delta', '>', 0)->sum('delta');
+        $totalDown = collect($changes)->where('delta', '<', 0)->sum('delta');
+
+        $this->logActivity(
+            'Stock Opname',
+            'Stock opname: '.count($changes)." item(s) adjusted (+{$totalUp} / {$totalDown}). Reason: {$data['reason']}",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
-        $message = $delta > 0
-            ? "Stock opname {$invent->name}: +{$delta} {$invent->unit} (penyesuaian naik)."
-            : "Stock opname {$invent->name}: {$delta} {$invent->unit} (penyesuaian turun).";
-
-        return redirect(route('stock'))->with('success', $message);
+        return redirect(route('stock'))->with('success', 'Stock opname successful: '.count($changes).' item(s) adjusted.');
     }
 
     private function clearCache($storeId)
     {
         Cache::forget("stock_{$storeId}");
+        
         Cache::forget("invents_{$storeId}");
+    }
+
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
     }
 }

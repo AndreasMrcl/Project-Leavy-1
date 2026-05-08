@@ -39,16 +39,10 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-history text-indigo-600"></i> Log Aktivitas
+                        <i class="fas fa-history text-indigo-600"></i> Log Activity
                     </h1>
-                    <p class="text-sm text-gray-500 mt-1">Pantau Aktivitas Pengguna & Sistem</p>
+                    <p class="text-sm text-gray-500 mt-1">Monitor User & System Activities</p>
                 </div>
-
-                <!-- Statistik Ringkas -->
-                {{-- <div class="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100">
-                    <span class="text-xs text-indigo-500 uppercase font-bold">Total Logs</span>
-                    <span class="text-lg font-bold text-indigo-700">{{ $logs->total() }}</span>
-                </div> --}}
             </div>
 
             <!-- Table Section -->
@@ -57,9 +51,9 @@
                     <table id="myTable" class="w-full text-left border-collapse stripe hover">
                         <thead class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal font-bold">
                             <tr>
-                                <th class="p-4 rounded-tl-lg w-1/4">Waktu / Akun</th>
-                                <th class="p-4 w-1/5">Tipe Aksi</th>
-                                <th class="p-4 rounded-tr-lg">Deskripsi</th>
+                                <th class="p-4 rounded-tl-lg w-1/4">Time / Account</th>
+                                <th class="p-4 w-1/5">Action Type</th>
+                                <th class="p-4 rounded-tr-lg">Description</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-700 text-sm divide-y divide-gray-200">
@@ -69,7 +63,6 @@
                                     <!-- 1. Waktu & Aktor -->
                                     <td class="p-4">
                                         <div class="flex flex-col gap-1 mb-3">
-                                            <!-- Menggunakan Accessor dari Model -->
                                             <span class="font-bold text-gray-800 text-sm">
                                                 {{ $log->created_at_formatted }}
                                             </span>
@@ -78,9 +71,7 @@
                                             </span>
                                         </div>
                                         @php
-                                            $name =
-                                                $log->user?->name ??
-                                                ($log->employee?->name ?? ($log->staff?->name ?? 'S'));
+                                            $name = $log->user?->name ?? 'System';
                                         @endphp
 
                                         <div
@@ -97,7 +88,7 @@
                                                 </p>
 
                                                 <p class="text-[10px] text-gray-400 truncate">
-                                                    ID: #{{ $log->user_id ?? ($log->employee_id ?? $log->staff_id) }}
+                                                    ID: #{{ $log->user_id ?? '-' }}
                                                 </p>
                                             </div>
                                         </div>
@@ -106,7 +97,7 @@
                                     <!-- 2. Action (Badge Warna-warni) -->
                                     <td class="p-4 align-middle">
                                         @php
-                                            $actLower = strtolower($log->action);
+                                            $actLower = strtolower($log->activity_type);
                                             $badgeClass = 'bg-gray-100 text-gray-600 border-gray-200';
                                             $icon = 'fa-info-circle';
 
@@ -160,9 +151,9 @@
                                                 class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                                 <i class="fas fa-history text-4xl text-gray-300"></i>
                                             </div>
-                                            <h3 class="text-lg font-medium text-gray-900">Tidak Ada Log Aktivitas</h3>
-                                            <p class="text-sm text-gray-500 mt-1">Aktivitas sistem akan direkam
-                                                di sini secara otomatis.</p>
+                                            <h3 class="text-lg font-medium text-gray-900">No Activity Logs Found</h3>
+                                            <p class="text-sm text-gray-500 mt-1">System activities will be recorded
+                                                here automatically.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -171,13 +162,6 @@
                     </table>
 
                 </div>
-
-                {{-- <!-- Pagination -->
-                @if ($logs->hasPages())
-                    <div class="p-4 border-t border-gray-100 bg-gray-50">
-                        {{ $logs->links() }}
-                    </div>
-                @endif --}}
             </div>
         </div>
     </main>

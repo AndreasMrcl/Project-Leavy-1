@@ -19,6 +19,7 @@ return new class extends Migration
                 'order_restore',
                 'manual_adjust',
                 'receive',
+                'delete'
             ]);
             $table->nullableMorphs('reference');
             $table->string('notes')->nullable();

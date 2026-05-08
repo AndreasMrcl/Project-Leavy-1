@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class StoreController extends Controller
 {
@@ -18,7 +21,7 @@ class StoreController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'no_telpon' => 'required|string|max:15', // Adjust the validation if needed
+            'no_telpon' => 'required|string|max:15',
             'ktp' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'atas_nama' => 'required|string|max:255',
             'bank' => 'required|string|max:255',
@@ -32,39 +35,92 @@ class StoreController extends Controller
 
         if ($request->hasFile('ktp')) {
             $uploadedKtp = $request->file('ktp');
-            $ktpName = time().'_'.$uploadedKtp->getClientOriginalName(); // Prefix with timestamp for uniqueness
+            $ktpName = time().'_'.$uploadedKtp->getClientOriginalName();
             $ktpPath = $uploadedKtp->storeAs('ktp', $ktpName, 'public');
-            $data['ktp'] = $ktpPath; // Path is relative to 'storage/app/public'
+            $data['ktp'] = $ktpPath;
         }
 
-        Store::create($data);
+        $store = Store::create($data);
 
-        return redirect(route('dashboard'))->with('success', 'Store berhasil ditambahkan!');
+        $this->logActivity(
+            'Create Store',
+            "Creating new store: {$store->name}",
+            $store->id
+        );
+
+        return redirect(route('dashboard'))->with('success', 'Store successfully added!');
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        $userCompany = auth()->user()->compani;
+        $userStore = Auth::user()->store;
+
+        $store = Store::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
         $validated = $request->validate([
-            'store' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'no_telpon' => 'nullable|string|max:15',
+            'atas_nama' => 'nullable|string|max:255',
             'bank' => 'nullable|string|max:255',
             'no_rek' => 'nullable|string|max:50',
-            'location' => 'required|string|max:255',
             'ktp' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'location' => 'nullable|string|max:255',
         ]);
 
-        // Upload KTP if exists
+        $old = [
+            'name' => $store->name,
+            'no_telpon' => $store->no_telpon,
+            'atas_nama' => $store->atas_nama,
+            'bank' => $store->bank,
+            'no_rek' => $store->no_rek,
+            'location' => $store->location,
+        ];
+
+        // Upload KTP jika ada file baru
         if ($request->hasFile('ktp')) {
             $file = $request->file('ktp');
             $filename = time().'_'.$file->getClientOriginalName();
             $path = $file->storeAs('ktp', $filename, 'public');
             $validated['ktp'] = $path;
+        } else {
+            unset($validated['ktp']);
         }
 
-        $userCompany->update($validated);
+        $store->update($validated);
 
-        return redirect()->back()
-            ->with('success', 'Company successfully updated!');
+        // Detect what changed (kecuali ktp — log terpisah)
+        $changes = [];
+        foreach ($old as $field => $value) {
+            if (($validated[$field] ?? null) != $value) {
+                $label = ucfirst(str_replace('_', ' ', $field));
+                $changes[] = "{$label} updated from '{$value}' to '{$validated[$field]}'";
+            }
+        }
+
+        if ($request->hasFile('ktp')) {
+            $changes[] = 'KTP re-uploaded';
+        }
+
+        if ($changes) {
+            $desc = "Update Store '{$store->name}': ".implode(', ', $changes);
+            $this->logActivity('Update Store', $desc, $store->id);
+        }
+
+        return redirect()->back()->with('success', 'Store information successfully updated!');
+    }
+
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
     }
 }

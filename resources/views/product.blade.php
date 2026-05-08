@@ -25,6 +25,7 @@
             border-bottom: 1px solid #e5e7eb;
         }
     </style>
+
 </head>
 
 <body class="bg-gray-50 font-sans">
@@ -55,236 +56,112 @@
                 </div>
             </div>
 
-            <!-- Table Section -->
-            @foreach ($category as $cat)
-            <div class="w-full bg-white rounded-xl shadow-md border border-gray-100 mb-6">
-                <div class="p-5">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-folder text-red-500"></i> {{ $cat->name }}
-                        <span class="text-sm font-normal text-gray-500">({{ $cat->menus->count() }} items)</span>
-                    </h2>
-                    <div class="overflow-auto">
-                        <table class="categoryTable w-full text-left" data-category-id="{{ $cat->id }}">
+            <div class="w-full bg-white rounded-xl shadow-md border border-gray-100">
+                <div class="p-5 overflow-x-auto">
 
-                            <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
-                                <tr>
-                                    <th class="p-4 font-bold text-center rounded-tl-lg" width="5%">No</th>
-                                    <th class="p-4 font-bold text-center" width="20%">Created at</th>
-                                    <th class="p-4 font-bold">Name</th>
-                                    <th class="p-4 font-bold">Price</th>
-                                    <th class="p-4 font-bold text-center rounded-tr-lg" width="15%">Action</th>
-                                </tr>
-                            </thead>
+                    @if ($category->isEmpty())
+                                <!-- Empty State -->
+                                <div class="flex flex-col items-center justify-center py-12 text-center">
+                                    <div class="text-gray-400 mb-4">
+                                        <i class="fas fa-inbox text-6xl"></i>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-gray-600 mb-2">No products available</h3>
+                                    <p class="text-gray-500 mb-6">Add products to start managing your catalog.</p>
+                                    <button id="emptyAddBtn" aria-label="Add first product"
+                                        class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold flex items-center gap-2">
+                                        <i class="fas fa-plus"></i> Add Product
+                                    </button>
+                                </div>
 
-                            <tbody class="text-gray-700 text-sm">
-                                @php $no = 1; @endphp
+                            </div>
+                        </div>
+                    @else
 
-                                @forelse ($cat->menus as $menu)
+                @foreach ($category as $cat)
+                    <!-- Table Section -->
+                    <div class=" mb-6">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-folder text-red-500"></i> {{ $cat->name }}
+                            <span class="text-sm font-normal text-gray-500">({{ $cat->menus->count() }} items)</span>
+                        </h2>
+                        <div class="overflow-auto">
+                            <table class="categoryTable w-full text-left" data-category-id="{{ $cat->id }}">
 
-                                    <tr class="hover:bg-gray-50 transition duration-150">
-                                        <td class="p-4 font-medium text-center">{{ $no++ }}</td>
-
-                                        <td class="p-4 font-medium text-center">
-                                            {{ \Carbon\Carbon::parse($menu->created_at)->format('d M Y') }}
-                                        </td>
-
-                                        <td class="p-4">
-                                            <span class="font-semibold text-gray-800">
-                                                {{ $menu->name }}
-                                            </span>
-                                        </td>
-
-                                        <td class="p-4">
-                                            <span class="font-semibold text-gray-800">
-                                                Rp {{ number_format($menu->price, 0, ',', '.') }}
-                                            </span>
-                                        </td>
-
-                                        <td class="p-4">
-                                            <div class="flex justify-center items-center gap-2">
-                                                <button
-                                                    class="editBtn w-9 h-9 flex items-center justify-center bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 hover:scale-105 transition"
-                                                    data-id="{{ $menu->id }}" data-name="{{ $menu->name }}"
-                                                    data-price="{{ $menu->price }}" data-category_id="{{ $menu->category_id }}"
-                                                    data-desc="{{ $menu->description }}" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-
-                                                <form method="post" action="{{ route('delproduct', ['id' => $menu->id]) }}"
-                                                    class="inline deleteForm">
-                                                    @csrf
-                                                    @method('delete')
-                                                    <button type="button"
-                                                        class="delete-confirm w-9 h-9 flex items-center justify-center bg-red-500 text-white rounded-lg shadow hover:bg-red-600 hover:scale-105 transition"
-                                                        title="Hapus">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
+                                <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                                     <tr>
-                                        <td class="p-4 text-center text-gray-500"></td>
-                                        <td class="p-4 text-center text-gray-500"></td>
-                                        <td class="p-4 text-center text-gray-500">No menu in this category</td>
-                                        <td class="p-4 text-center text-gray-500"></td>
-                                        <td class="p-4 text-center text-gray-500"></td>
+                                        <th class="p-4 font-bold text-center rounded-tl-lg" width="5%">No</th>
+                                        <th class="p-4 font-bold text-center" width="20%">Created at</th>
+                                        <th class="p-4 font-bold">Name</th>
+                                        <th class="p-4 font-bold">Price</th>
+                                        <th class="p-4 font-bold text-center rounded-tr-lg" width="15%">Action</th>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+
+                                <tbody class="text-gray-700 text-sm">
+                                    @php $no = 1; @endphp
+
+                                    @forelse ($cat->menus as $menu)
+
+                                        <tr class="hover:bg-gray-50 transition duration-150">
+                                            <td class="p-4 font-medium text-center">{{ $no++ }}</td>
+
+                                            <td class="p-4 font-medium text-center">
+                                                {{ \Carbon\Carbon::parse($menu->created_at)->format('d M Y') }}
+                                            </td>
+
+                                            <td class="p-4">
+                                                <span class="font-semibold text-gray-800">
+                                                    {{ $menu->name }}
+                                                </span>
+                                            </td>
+
+                                            <td class="p-4">
+                                                <span class="font-semibold text-gray-800">
+                                                    Rp {{ number_format($menu->price, 0, ',', '.') }}
+                                                </span>
+                                            </td>
+
+                                            <td class="p-4">
+                                                <div class="flex justify-center items-center gap-2">
+                                                    <button
+                                                        class="editBtn w-9 h-9 flex items-center justify-center bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 hover:scale-105 transition"
+                                                        data-id="{{ $menu->id }}" data-name="{{ $menu->name }}"
+                                                        data-price="{{ $menu->price }}" data-category_id="{{ $menu->category_id }}"
+                                                        data-desc="{{ $menu->description }}" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+
+                                                    <form method="post" action="{{ route('delproduct', ['id' => $menu->id]) }}"
+                                                        class="inline deleteForm">
+                                                        @csrf
+                                                        @method('delete')
+                                                        <button type="button"
+                                                            class="delete-confirm w-9 h-9 flex items-center justify-center bg-red-500 text-white rounded-lg shadow hover:bg-red-600 hover:scale-105 transition"
+                                                            title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td class="p-4 text-center text-gray-500"></td>
+                                            <td class="p-4 text-center text-gray-500"></td>
+                                            <td class="p-4 text-center text-gray-500">No menu in this category</td>
+                                            <td class="p-4 text-center text-gray-500"></td>
+                                            <td class="p-4 text-center text-gray-500"></td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            </div>
-            @endforeach
+                @endforeach
+            @endif
 
         </div>
     </main>
-
-    <!-- ADD MODAL -->
-    <div id="addModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeAddModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-tags text-red-500"></i> Add
-            </h2>
-
-            <form id="addForm" method="post" action="{{ route('postproduct') }}" enctype="multipart/form-data"
-                class="space-y-5">
-                @csrf @method('post')
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
-                        <input type="text" name="name"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
-                            required>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Price</label>
-                        <input type="text" id="priceInput" name="price"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
-                            placeholder="Rp 0" required>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-                        <select name="category_id"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
-                            required>
-                            <option value="">Select Category</option>
-                            @foreach ($category as $item)
-                                <option value="{{ $item->id }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Img</label>
-                        <input type="file" name="img"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
-                            required>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                        <textarea class="bg-gray-50 border border-gray-300 text-gray-900 p-2 rounded-lg w-full"
-                            id="description" name="description" placeholder="Description produk" required></textarea>
-                        <p class="text-gray-500 text-right"><span id="charCount"></span>/200 characters</p>
-                    </div>
-                </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-yellow-600 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-check"></i> Save
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- EDIT MODAL -->
-    <div id="editModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-edit text-blue-600"></i> Edit
-            </h2>
-
-            <form id="editForm" method="post" enctype="multipart/form-data" class="space-y-5">
-                @csrf @method('put')
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
-                        <input type="text" id="editName" name="name"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                            required>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Price</label>
-                        <input type="text" id="editPriceInput" name="price"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                            placeholder="Rp 0" required>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-                        <select name="category_id" id="editCategory"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                            required>
-                            <option value="">Select Category</option>
-                            @foreach ($category as $item)
-                                <option value="{{ $item->id }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Img</label>
-                        <input type="file" name="img"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500">
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                        <textarea type="text" id="editDesc" name="desc"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                            required></textarea>
-                    </div>
-                </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-save"></i> Update
-                </button>
-            </form>
-        </div>
-    </div>
 
     <!-- SCRIPTS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -292,95 +169,12 @@
 
     <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            // Format number to Rupiah
-            function formatRupiah(angka) {
-                var number_string = angka.replace(/[^,\d]/g, '').toString(),
-                    split = number_string.split(','),
-                    sisa = split[0].length % 3,
-                    rupiah = split[0].substr(0, sisa),
-                    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    <script src="{{ asset('modal/prod.js') }}"></script>
 
-                if (ribuan) {
-                    var separator = sisa ? '.' : '';
-                    rupiah += separator + ribuan.join('.');
-                }
-                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-                return 'Rp ' + rupiah;
-            }
+    <!-- Modals -->
+    @include('modal.addProd')
 
-            // Price input formatting
-            $('#priceInput').on('keyup', function () {
-                $(this).val(formatRupiah($(this).val()));
-            });
-
-            $('#editPriceInput').on('keyup', function () {
-                $(this).val(formatRupiah($(this).val()));
-            });
-
-            // Convert Rupiah to number before submit
-            $('#addForm').on('submit', function () {
-                var priceValue = $('#priceInput').val().replace(/[^,\d]/g, '');
-                $('#priceInput').val(priceValue);
-            });
-
-            $('#editForm').on('submit', function () {
-                var priceValue = $('#editPriceInput').val().replace(/[^,\d]/g, '');
-                $('#editPriceInput').val(priceValue);
-            });
-
-            // Init DataTable for each category table
-            $('.categoryTable').each(function () {
-                new DataTable($(this), {});
-            });
-
-            // Modal Logic
-            const addModal = $('#addModal');
-            const editModal = $('#editModal');
-
-            $('#addBtn').click(() => addModal.removeClass('hidden'));
-            $('#closeAddModal').click(() => addModal.addClass('hidden'));
-
-            // Edit Logic
-            $(document).on('click', '.editBtn', function () {
-                const btn = $(this);
-                $('#editName').val(btn.data('name'));
-                $('#editPriceInput').val('Rp ' + btn.data('price').toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                $('#editCategory').val(btn.data('category_id'));
-                $('#editDesc').val(btn.data('desc'));
-
-                $('#editForm').attr('action', `/product/${btn.data('id')}/update`);
-                editModal.removeClass('hidden');
-            });
-
-            $('#closeModal').click(() => editModal.addClass('hidden'));
-
-            $(window).click((e) => {
-                if (e.target === addModal[0]) addModal.addClass('hidden');
-                if (e.target === editModal[0]) editModal.addClass('hidden');
-            });
-
-            // Delete confirmation
-            $(document).on('click', '.delete-confirm', function (e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Hapus?',
-                    text: "Data akan dihapus permanen.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Hapus',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) form.submit();
-                });
-
-            });
-        });
-    </script>
+    @include('modal.editProd')
 
     @include('sweetalert::alert')
 

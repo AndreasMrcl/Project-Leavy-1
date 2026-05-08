@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('price', 15, 2); // Changed to decimal for currency
             $table->string('img')->nullable(); // Added nullable for optional image
-            $table->string('desc');
+            $table->string('description');
             $table->boolean('has_variety')->default(false);
             $table->json('varieties')->nullable();
             $table->unsignedBigInteger('category_id'); // Define the category_id column

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Invent;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class InventController extends Controller
             'initial_stock' => 'nullable|integer|min:0',
         ]);
 
-        DB::transaction(function () use ($data, $userStore) {
+        $newInvent = DB::transaction(function () use ($data, $userStore) {
             $invent = Invent::create([
                 'store_id' => $userStore->id,
                 'name' => $data['name'],
@@ -56,11 +57,19 @@ class InventController extends Controller
                     'notes' => 'Initial stock',
                 ]);
             }
+
+            return $invent;
         });
+
+        $this->logActivity(
+            'Create Invent',
+            "Adding new ingredient: {$newInvent->name} (Initial stock: ".(int) ($data['initial_stock'] ?? 0)." {$newInvent->unit})",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
-        return redirect(route('invent'))->with('success', 'Bahan berhasil ditambahkan!');
+        return redirect(route('invent'))->with('success', 'Ingredient successfully added!');
     }
 
     public function update(Request $request, $id)
@@ -77,15 +86,37 @@ class InventController extends Controller
             ->where('store_id', $userStore->id)
             ->firstOrFail();
 
-        $invent->update([
+        $old = [
+            'name' => $invent->name,
+            'unit' => $invent->unit,
+            'min_stock' => $invent->min_stock,
+        ];
+
+        $new = [
             'name' => $data['name'],
             'unit' => $data['unit'],
             'min_stock' => $data['min_stock'] ?? 0,
-        ]);
+        ];
+
+        $invent->update($new);
+
+        // Detect what changed
+        $changes = [];
+        foreach ($new as $field => $value) {
+            if ($old[$field] != $value) {
+                $label = ucfirst(str_replace('_', ' ', $field));
+                $changes[] = "{$label} changed from '{$old[$field]}' to '{$value}'";
+            }
+        }
+
+        if ($changes) {
+            $desc = "Update Invent '{$invent->name}': ".implode(', ', $changes);
+            $this->logActivity('Update Invent', $desc, $userStore->id);
+        }
 
         $this->clearCache($userStore->id);
 
-        return redirect(route('invent'))->with('success', 'Bahan berhasil diupdate!');
+        return redirect(route('invent'))->with('success', 'Ingredient successfully updated!');
     }
 
     public function destroy($id)
@@ -100,16 +131,37 @@ class InventController extends Controller
             return redirect(route('invent'))->withErrors(['msg' => 'Bahan tidak ditemukan.']);
         }
 
+        $name = $invent->name;
+
         $invent->delete();
+
+        $this->logActivity(
+            'Delete Invent',
+            "Deleting ingredient: {$name}",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
-        return redirect(route('invent'))->with('success', 'Bahan berhasil dihapus!');
+        return redirect(route('invent'))->with('success', 'Ingredient successfully deleted!');
     }
 
     private function clearCache($storeId)
     {
         Cache::forget("invents_{$storeId}");
         Cache::forget("stock_{$storeId}");
+    }
+
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
     }
 }

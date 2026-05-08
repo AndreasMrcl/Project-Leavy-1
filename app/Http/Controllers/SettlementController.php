@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Cart;
 use App\Models\Settlement;
 use Carbon\Carbon;
@@ -37,7 +38,7 @@ class SettlementController extends Controller
         $activeShift = $user->settlements()->active()->first();
 
         if ($activeShift) {
-            return redirect(route('settlement'))->with('error', 'Shift sebelumnya belum ditutup. Tutup dulu sebelum membuka shift baru.');
+            return redirect(route('settlement'))->with('error', "The previous shift hasn't closed yet. Please close it before opening a new shift.");
         }
 
         $data['store_id'] = $userStore->id;
@@ -45,6 +46,12 @@ class SettlementController extends Controller
         $data['expected'] = $data['start_amount'] ?? 0;
 
         $user->settlements()->create($data);
+
+        $this->logActivity(
+            'Open Shift',
+            'Opening shift with initial cash: Rp '.number_format($data['expected'] ?? 0, 0, ',', '.'),
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
@@ -63,16 +70,22 @@ class SettlementController extends Controller
         $activeShift = $user->settlements()->active()->first();
 
         if (! $activeShift) {
-            return redirect(route('settlement'))->with('error', 'Tidak ada shift aktif yang bisa ditutup.');
+            return redirect(route('settlement'))->with('error', 'There is no active shift that can be closed.');
         }
 
         $openBillCount = Cart::openBills()->where('store_id', $userStore->id)->count();
         if ($openBillCount > 0) {
-            return redirect(route('settlement'))->with('error', "Tidak bisa tutup shift: masih ada {$openBillCount} open bill aktif. Tagih atau batalkan dulu di halaman Order.");
+            return redirect(route('settlement'))->with('error', "Cannot close shift: there are still {$openBillCount} open bills. Please settle or cancel them first on the Order page.");
         }
 
         $data['end_time'] = Carbon::now()->toDateTimeString();
         $activeShift->update($data);
+
+        $this->logActivity(
+            'Close Shift',
+            'Closing shift with total cash: Rp '.number_format($data['total_amount'] ?? 0, 0, ',', '.'),
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
@@ -99,6 +112,12 @@ class SettlementController extends Controller
         $settlement = Settlement::findOrFail($id);
         $settlement->delete();
 
+        $this->logActivity(
+            'Delete Settlement',
+            "Deleting settlement #{$id}",
+            $userStore->id
+        );
+
         $this->clearCache($userStore->id);
         Cache::forget("settlement_{$id}");
 
@@ -108,5 +127,18 @@ class SettlementController extends Controller
     private function clearCache(int $storeId): void
     {
         Cache::forget("settlement_{$storeId}");
+    }
+
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
     }
 }

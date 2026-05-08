@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,7 @@ class CategoryController extends Controller
         $cacheKey = "category_{$userStore->id}";
 
         $category = Cache::remember($cacheKey, 180, function () use ($userStore) {
+
             return $userStore->categories()->get();
         });
 
@@ -33,11 +35,17 @@ class CategoryController extends Controller
 
         $data['store_id'] = $userStore->id;
 
-        Category::create([
+        $category = Category::create([
             'name' => $data['name'],
             'desc' => $data['desc'],
             'store_id' => $userStore->id,
         ]);
+
+        $this->logActivity(
+            'Create Category',
+            "Adding new categories: {$category->name}",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
@@ -57,10 +65,29 @@ class CategoryController extends Controller
             ->where('store_id', $userStore->id)
             ->firstOrFail();
 
+        $old = [
+            'name' => $category->name,
+            'desc' => $category->desc,
+        ];
+
         $category->update([
             'name' => $data['name'],
             'desc' => $data['desc'],
         ]);
+
+        // Detect what changed
+        $changes = [];
+        foreach ($data as $field => $value) {
+            if ($old[$field] != $value) {
+                $label = ucfirst(str_replace('_', ' ', $field));
+                $changes[] = "{$label} changed from '{$old[$field]}' to '{$value}'";
+            }
+        }
+
+        if ($changes) {
+            $desc = "Update Category '{$category->name}': " . implode(', ', $changes);
+            $this->logActivity('Update Category', $desc, $userStore->id);
+        }
 
         $this->clearCache($userStore->id);
 
@@ -76,19 +103,39 @@ class CategoryController extends Controller
             ->first();
 
         if (! $category) {
-            return redirect(route('category'))->withErrors(['msg' => 'Kategori tidak ditemukan.']);
+            return redirect(route('category'))->withErrors(['msg' => 'Category not found.']);
         }
+
+        $name = $category->name;
 
         $category->delete();
 
+        $this->logActivity(
+            'Delete Category',
+            "Deleting category: {$name}",
+            $userStore->id
+        );
+
         $this->clearCache($userStore->id);
 
-        return redirect(route('category'))->with('success', 'Kategori berhasil dihapus!');
+        return redirect(route('category'))->with('success', 'Category successfully deleted!');
     }
 
     private function clearCache(int $storeId): void
     {
         Cache::forget("category_{$storeId}");
     }
-}
 
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
+    }
+}

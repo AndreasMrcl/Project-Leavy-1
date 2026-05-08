@@ -72,4 +72,14 @@ class Store extends Model
     {
         return $this->hasMany(Expense::class);
     }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
+
+    public function storeConfig()
+    {
+        return $this->hasOne(StoreConfig::class);
+    }
 }

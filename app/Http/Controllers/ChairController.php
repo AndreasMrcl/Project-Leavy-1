@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Cart;
 use App\Models\Chair;
 use App\Models\Order;
@@ -12,7 +13,6 @@ use Illuminate\Support\Str;
 
 class ChairController extends Controller
 {
-
     public function index()
     {
         $userStore = Auth::user()->store;
@@ -46,6 +46,12 @@ class ChairController extends Controller
         ]);
 
         $token = $chair->createToken('auth_token')->plainTextToken;
+
+        $this->logActivity(
+            'Create Chair',
+            "Adding new chair: {$chair->name}",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
@@ -82,7 +88,15 @@ class ChairController extends Controller
 
         Cart::where('chair_id', $chair->id)->delete();
 
+        $name = $chair->name;
+
         $chair->delete();
+
+        $this->logActivity(
+            'Delete Chair',
+            "Deleting chair: {$name}",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
@@ -94,5 +108,18 @@ class ChairController extends Controller
     private function clearCache(int $storeId): void
     {
         Cache::forget("chair_{$storeId}");
+    }
+
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
     }
 }

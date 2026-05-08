@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Chair;
 use App\Models\Discount;
 use App\Models\Expense;
@@ -9,8 +10,7 @@ use App\Models\History;
 use App\Models\Invent;
 use App\Models\Menu;
 use App\Models\Order;
-use App\Models\Settlement;
-use App\Models\User;
+use App\Models\Showcase;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -218,40 +218,88 @@ class Pagescontroller extends Controller
 
     public function search(Request $request)
     {
+        if (! Auth::check()) {
+            return redirect('/');
+        }
 
-        $query = $request->input('search');
-
-        // POST SEARCH
-        $orderResults = Order::where('atas_nama', 'LIKE', '%'.$query.'%')
-            ->orWhere('no_telpon', 'LIKE', '%'.$query.'%')
-            ->get();
-
-        // EMPLOYEE SEARCH
-        $employeeResults = User::where('level', 'admin')
-            ->where(function ($q) use ($query) {
-                $q->where('name', 'LIKE', '%'.$query.'%')
-                    ->orWhere('email', 'LIKE', '%'.$query.'%');
-            })
-            ->get();
-
-        // CHAIR SEARCH
         $userStore = Auth::user()->store;
-        $chairResults = Chair::where('store_id', $userStore->id)
-            ->where(function ($q) use ($query) {
-                $q->where('name', 'LIKE', '%'.$query.'%')
-                    ->orWhere('email', 'LIKE', '%'.$query.'%');
-            })
-            ->get();
 
-        // HISTORY SEARCH
-        $historyResults = History::where('name', 'LIKE', '%'.$query.'%')
-            ->orWhere('akun', 'LIKE', '%'.$query.'%')
-            ->get();
+        if (! $userStore) {
+            return redirect()->route('addstore');
+        }
 
-        // DISCOUNT SEARCH
-        $discountResults = Discount::where('name', 'LIKE', '%'.$query.'%')
-            ->get();
+        $search = $request->input('search');
 
-        return view('search', compact('orderResults', 'employeeResults', 'chairResults', 'historyResults', 'discountResults'));
+        $menus = Menu::with('category')->where('store_id', $userStore->id);
+        $categories = Category::where('store_id', $userStore->id);
+        $invents = Invent::where('store_id', $userStore->id);
+        $orders = Order::with(['cart'])->where('store_id', $userStore->id);
+        $histories = History::where('store_id', $userStore->id);
+        $discounts = Discount::where('store_id', $userStore->id);
+        $expenses = Expense::where('store_id', $userStore->id);
+        $showcases = Showcase::where('store_id', $userStore->id);
+        $chairs = Chair::where('store_id', $userStore->id);
+
+        if ($search) {
+
+            $menus->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+
+            $categories->where('name', 'LIKE', "%{$search}%");
+
+            $invents->where('name', 'LIKE', "%{$search}%");
+
+            $orders->where(function ($q) use ($search) {
+                $q->where('atas_nama', 'LIKE', "%{$search}%")
+                    ->orWhere('no_telpon', 'LIKE', "%{$search}%")
+                    ->orWhere('status', 'LIKE', "%{$search}%");
+            });
+
+            $histories->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('akun', 'LIKE', "%{$search}%")
+                    ->orWhere('order', 'LIKE', "%{$search}%");
+            });
+
+            $discounts->where('name', 'LIKE', "%{$search}%");
+
+            $expenses->where('name', 'LIKE', "%{$search}%");
+
+            $showcases->where('name', 'LIKE', "%{$search}%");
+
+            $chairs->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        return view('search', [
+            'menus'      => $menus->get(),
+            'categories' => $categories->get(),
+            'invents'    => $invents->get(),
+            'orders'     => $orders->get(),
+            'histories'  => $histories->get(),
+            'discounts'  => $discounts->get(),
+            'expenses'   => $expenses->get(),
+            'showcases'  => $showcases->get(),
+            'chairs'     => $chairs->get(),
+        ]);
+    }
+
+    public function profile()
+    {
+        if (! Auth::check()) {
+            return redirect('/');
+        }
+
+        $userStore = Auth::user()->store;
+
+        if (! $userStore) {
+            return redirect()->route('addstore');
+        }
+
+        return view('profile', compact('userStore'));
     }
 }

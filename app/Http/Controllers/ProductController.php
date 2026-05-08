@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\CartMenu;
 use App\Models\Category;
 use App\Models\Discount;
@@ -50,7 +51,7 @@ class ProductController extends Controller
 
         $data['store_id'] = $userStore->id;
 
-        Menu::create([
+        $menu = Menu::create([
             'name' => $data['name'],
             'price' => $data['price'],
             'img' => $data['img'],
@@ -59,9 +60,15 @@ class ProductController extends Controller
             'store_id' => $userStore->id,
         ]);
 
+        $this->logActivity(
+            'Create Product',
+            "Adding new product: {$menu->name} (Rp ".number_format($menu->price, 0, ',', '.').')',
+            $userStore->id
+        );
+
         $this->clearCache($userStore->id);
 
-        return redirect(route('product'))->with('success', 'Product Sukses Dibuat !');
+        return redirect(route('product'))->with('success', 'Product successfully created!');
     }
 
     public function show($id)
@@ -89,14 +96,38 @@ class ProductController extends Controller
             ->where('store_id', $userStore->id)
             ->firstOrFail();
 
+        $old = [
+            'name' => $menu->name,
+            'description' => $menu->description,
+        ];
+
         $menu->update([
             'name' => $data['name'],
             'description' => $data['desc'],
         ]);
 
+        $new = [
+            'name' => $data['name'],
+            'description' => $data['desc'],
+        ];
+
+        // Detect what changed
+        $changes = [];
+        foreach ($new as $field => $value) {
+            if ($old[$field] != $value) {
+                $label = ucfirst(str_replace('_', ' ', $field));
+                $changes[] = "{$label} changed from '{$old[$field]}' to '{$value}'";
+            }
+        }
+
+        if ($changes) {
+            $desc = "Update Product '{$menu->name}': ".implode(', ', $changes);
+            $this->logActivity('Update Product', $desc, $userStore->id);
+        }
+
         $this->clearCache($userStore->id);
 
-        return redirect(route('product'))->with('success', 'Product Sukses Diupdate !');
+        return redirect(route('product'))->with('success', 'Product successfully updated!');
     }
 
     public function destroy($id)
@@ -108,7 +139,7 @@ class ProductController extends Controller
             ->first();
 
         if (! $menu) {
-            return redirect(route('product'))->withErrors(['msg' => 'Product tidak ditemukan.']);
+            return redirect(route('product'))->withErrors(['msg' => 'Product not found.']);
         }
 
         // hapus relasi cart_menu
@@ -119,15 +150,36 @@ class ProductController extends Controller
             Storage::disk('public')->delete($menu->img);
         }
 
+        $name = $menu->name;
+
         $menu->delete();
+
+        $this->logActivity(
+            'Delete Product',
+            "Deleting product: {$name}",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
-        return redirect()->route('product')->with('success', 'Product berhasil dihapus!');
+        return redirect()->route('product')->with('success', 'Product successfully deleted!');
     }
 
     private function clearCache(int $storeId): void
     {
         Cache::forget("menu_{$storeId}");
+    }
+
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Showcase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,15 +41,21 @@ class ShowcaseController extends Controller
 
         $data['store_id'] = $userStore->id;
 
-        Showcase::create([
+        $showcase = Showcase::create([
             'name' => $data['name'],
             'img' => $data['img'],
             'store_id' => $userStore->id,
         ]);
 
+        $this->logActivity(
+            'Create Showcase',
+            "Adding new showcase: {$showcase->name}",
+            $userStore->id
+        );
+
         $this->clearCache($userStore->id);
 
-        return redirect(route('showcase'))->with('success', 'Showcase Sukses Dibuat !');
+        return redirect(route('showcase'))->with('success', 'Showcase successfully created!');
     }
 
     public function update(Request $request, $id)
@@ -71,14 +78,22 @@ class ShowcaseController extends Controller
             $data['img'] = 'img/' . $imageName;
         }
 
+        $oldName = $showcase->name;
+
         $showcase->update([
             'name' => $data['name'],
             'img' => $data['img'] ?? $showcase->img,
         ]);
 
+        $this->logActivity(
+            'Update Showcase',
+            "Update Showcase '{$oldName}' menjadi '{$showcase->name}'",
+            $userStore->id
+        );
+
         $this->clearCache($userStore->id);
 
-        return redirect(route('showcase'))->with('success', 'Showcase Sukses Diupdate !');
+        return redirect(route('showcase'))->with('success', 'Showcase successfully updated!');
     }
 
     public function destroy($id)
@@ -93,11 +108,19 @@ class ShowcaseController extends Controller
             return redirect(route('showcase'))->withErrors(['msg' => 'Showcase tidak ditemukan.']);
         }
 
+        $name = $showcase->name;
+
         $showcase->delete();
+
+        $this->logActivity(
+            'Delete Showcase',
+            "Deleting showcase: {$name}",
+            $userStore->id
+        );
 
         $this->clearCache($userStore->id);
 
-        return redirect(route('showcase'))->with('success', 'Showcase Berhasil Dihapus !');
+        return redirect(route('showcase'))->with('success', 'Showcase successfully deleted!');
     }
 
     private function clearCache(int $storeId): void
@@ -105,4 +128,16 @@ class ShowcaseController extends Controller
         Cache::forget("showcase_{$storeId}");
     }
 
+    private function logActivity($type, $description, $storeId)
+    {
+        ActivityLog::create([
+            'user_id'       => Auth::id(),
+            'store_id'      => $storeId,
+            'activity_type' => $type,
+            'description'   => $description,
+            'created_at'    => now(),
+        ]);
+
+        Cache::forget("activities_{$storeId}");
+    }
 }

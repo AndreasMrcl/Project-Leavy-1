@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\QrController;
 use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\ShowcaseController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\StoreConfigController;
 use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,10 +40,19 @@ Route::middleware(['auth:sanctum', 'ensure'])->group(function () {
     // PAGES CONTROLLER
     Route::get('/dashboard', [Pagescontroller::class, 'dashboard'])->name('dashboard');
     Route::get('/search', [Pagescontroller::class, 'search'])->name('search');
+    Route::get('/profile', [Pagescontroller::class, 'profile'])->name('profile');
 
     // STORE CONTROLLER
     Route::get('/addstore', [StoreController::class, 'create'])->name('addstore');
     Route::post('/poststore', [StoreController::class, 'store'])->name('poststore');
+    Route::put('/store/{id}/update', [StoreController::class, 'update'])->name('updatestore');
+
+    // ACTIVITY LOG
+    Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activityLog');
+
+    // STORE CONFIG
+    Route::get('/storeconfig', [StoreConfigController::class, 'index'])->name('storeConfig');
+    Route::put('/storeconfig/update', [StoreConfigController::class, 'update'])->name('updatestoreConfig');
 
     // CHAIR CONTROLLER
     Route::get('/chair', [ChairController::class, 'index'])->name('chair');
@@ -61,7 +72,9 @@ Route::middleware(['auth:sanctum', 'ensure'])->group(function () {
     // STOCK CONTROLLER (Stok Bahan)
     Route::get('/stock', [StockController::class, 'index'])->name('stock');
     Route::post('/stock/receive', [StockController::class, 'receive'])->name('receiveinvent');
+    Route::get('/stock/opname', [StockController::class, 'opnameForm'])->name('opname');
     Route::post('/stock/opname', [StockController::class, 'opname'])->name('opnameinvent');
+
 
     // ORDER CONTROLLER
     Route::get('/order', [OrderController::class, 'index'])->name('order');

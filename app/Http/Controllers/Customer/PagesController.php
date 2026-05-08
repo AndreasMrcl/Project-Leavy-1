@@ -27,6 +27,7 @@ class PagesController extends Controller
         });
 
         $pendingCart = null;
+        
         if (! session('cart_acknowledged', false)) {
             $sessionStart = session('session_started_at');
 
