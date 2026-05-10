@@ -153,115 +153,16 @@
         </div>
     </main>
 
-    <!-- START MODAL -->
-    <div id="startModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeStartModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-play text-red-500"></i> Buka Shift
-            </h2>
-
-            <form id="startForm" method="post" action="{{ route('poststart') }}" class="space-y-5">
-                @csrf @method('post')
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Modal Awal (Rp)</label>
-                        <input type="number" name="start_amount" min="0" step="1"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500"
-                            placeholder="0">
-                    </div>
-                </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-check"></i> Buka Shift
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- END MODAL -->
-    <div id="endModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeEndModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-stop text-yellow-500"></i> Tutup Shift
-            </h2>
-
-            <form id="endForm" method="post" action="{{ route('posttotal') }}" class="space-y-5">
-                @csrf @method('post')
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Total Uang di Laci (Rp)</label>
-                        <input type="number" name="total_amount" min="0" step="1"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
-                            placeholder="0">
-                    </div>
-                </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-yellow-500 text-white font-bold rounded-lg shadow-md hover:bg-yellow-600 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-check"></i> Tutup Shift
-                </button>
-            </form>
-        </div>
-    </div>
+    @include('modal.startSettlement')
+    @include('modal.endSettlement')
 
     <!-- SCRIPTS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Init DataTable
-            new DataTable('#myTable', {});
-
-            // Modal Logic
-            const startModal = $('#startModal');
-            const endModal = $('#endModal');
-
-            $('#startBtn').click(() => startModal.removeClass('hidden'));
-            $('#closeStartModal').click(() => startModal.addClass('hidden'));
-
-            $('#endBtn').click(() => endModal.removeClass('hidden'));
-            $('#closeEndModal').click(() => endModal.addClass('hidden'));
-
-            $(window).click((e) => {
-                if (e.target === startModal[0]) startModal.addClass('hidden');
-                if (e.target === endModal[0]) endModal.addClass('hidden');
-            });
-
-            // Delete confirmation
-            $(document).on('click', '.delete-confirm', function (e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Hapus?',
-                    text: "Data akan dihapus permanen.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Hapus',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) form.submit();
-                });
-
-            });
-        });
-    </script>
+    <script src="{{ asset('modal/settlement.js') }}"></script>
 
     @include('sweetalert::alert')
-
     @include('layout.loading')
 
 </body>

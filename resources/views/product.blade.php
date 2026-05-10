@@ -113,6 +113,12 @@
                                                 <span class="font-semibold text-gray-800">
                                                     {{ $menu->name }}
                                                 </span>
+                                                @if ($menu->has_variety && ! empty($menu->varieties))
+                                                    <span class="ml-1 inline-block text-[10px] font-semibold uppercase text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full"
+                                                        title="{{ implode(', ', array_map(fn ($v) => ucwords(str_replace('_', ' ', $v)), $menu->varieties)) }}">
+                                                        {{ count($menu->varieties) }} variety
+                                                    </span>
+                                                @endif
                                             </td>
 
                                             <td class="p-4">
@@ -126,8 +132,11 @@
                                                     <button
                                                         class="editBtn w-9 h-9 flex items-center justify-center bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 hover:scale-105 transition"
                                                         data-id="{{ $menu->id }}" data-name="{{ $menu->name }}"
-                                                        data-price="{{ $menu->price }}" data-category_id="{{ $menu->category_id }}"
-                                                        data-desc="{{ $menu->description }}" title="Edit">
+                                                        data-price="{{ (int) $menu->price }}" data-category_id="{{ $menu->category_id }}"
+                                                        data-desc="{{ $menu->description }}"
+                                                        data-has_variety="{{ $menu->has_variety ? 1 : 0 }}"
+                                                        data-varieties='@json($menu->varieties ?? [])'
+                                                        title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
 

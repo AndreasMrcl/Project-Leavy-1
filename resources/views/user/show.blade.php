@@ -57,11 +57,16 @@
                     @if ($menu->has_variety && ! empty($menu->varieties))
                         <div class="space-y-2">
                             <h1 class='text-black text-base font-light'>*Variety</h1>
-                            <select name="variety" class='border p-2 w-full bg-gray-50 rounded-xl' required>
-                                @foreach ($menu->varieties as $v)
-                                    <option value="{{ $v }}">{{ ucwords(str_replace('_', ' ', $v)) }}</option>
+                            <input type="hidden" name="variety" id="varietyInput" value="{{ $menu->varieties[0] }}">
+                            <div class="flex flex-wrap gap-2">
+                                @foreach ($menu->varieties as $i => $v)
+                                    <button type="button"
+                                        data-variety="{{ $v }}"
+                                        class="varietyChip px-4 py-2 rounded-full border text-sm font-semibold transition {{ $i === 0 ? 'bg-red-800 text-white border-red-800' : 'bg-gray-50 text-gray-700 border-gray-300' }}">
+                                        {{ ucwords(str_replace('_', ' ', $v)) }}
+                                    </button>
                                 @endforeach
-                            </select>
+                            </div>
                         </div>
                     @endif
 
@@ -134,6 +139,18 @@
                 quantityInput.value = quantity;
             }
         }
+
+        document.querySelectorAll('.varietyChip').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.varietyChip').forEach(function (b) {
+                    b.classList.remove('bg-red-800', 'text-white', 'border-red-800');
+                    b.classList.add('bg-gray-50', 'text-gray-700', 'border-gray-300');
+                });
+                btn.classList.remove('bg-gray-50', 'text-gray-700', 'border-gray-300');
+                btn.classList.add('bg-red-800', 'text-white', 'border-red-800');
+                document.getElementById('varietyInput').value = btn.dataset.variety;
+            });
+        });
     </script>
 </body>
 

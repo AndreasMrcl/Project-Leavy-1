@@ -39,8 +39,7 @@
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
                         <i class="fas fa-receipt text-blue-500"></i> Orders
                     </h1>
-                    <p class="text-sm text-gray-500">Daftar pesanan aktif. Klik <strong>Done</strong> untuk arsipkan ke
-                        history shift.</p>
+                    <p class="text-sm text-gray-500">List of active orders. Click <strong>Done</strong> to archive to shift history.</p>
                 </div>
                 <a href="{{ route('addorder') }}"
                     class="px-10 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition font-semibold flex items-center gap-2">
@@ -60,12 +59,12 @@
                         <table class="w-full text-left text-sm">
                             <thead class="bg-amber-50 text-amber-800">
                                 <tr>
-                                    <th class="p-3 font-bold rounded-tl-lg">Dibuka</th>
-                                    <th class="p-3 font-bold">Meja</th>
+                                    <th class="p-3 font-bold rounded-tl-lg">Opened</th>
+                                    <th class="p-3 font-bold">Table</th>
                                     <th class="p-3 font-bold">Items</th>
                                     <th class="p-3 font-bold">Total</th>
                                     <th class="p-3 font-bold">Status</th>
-                                    <th class="p-3 font-bold text-center rounded-tr-lg" width="20%">Aksi</th>
+                                    <th class="p-3 font-bold text-center rounded-tr-lg" width="20%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700">
@@ -133,7 +132,7 @@
                                 <th class="p-4 font-bold text-center rounded-tl-lg" width="5%">No</th>
                                 <th class="p-4 font-bold">Date</th>
                                 <th class="p-4 font-bold">Order ID</th>
-                                <th class="p-4 font-bold">Layanan</th>
+                                <th class="p-4 font-bold">Service</th>
                                 <th class="p-4 font-bold">Chair</th>
                                 <th class="p-4 font-bold">Order</th>
                                 <th class="p-4 font-bold">Payment</th>
@@ -246,10 +245,10 @@
 
             <!-- Header -->
             <div class="px-8 pt-7 pb-5 border-b border-gray-100">
-                <h2 class="text-base font-semibold text-gray-500 uppercase tracking-wider">Tagih Bill <span id="obChairLabel" class="text-gray-900 normal-case"></span></h2>
+                <h2 class="text-base font-semibold text-gray-500 uppercase tracking-wider">Collect Payment <span id="obChairLabel" class="text-gray-900 normal-case"></span></h2>
                 <div class="mt-2 flex items-baseline gap-2">
                     <span class="text-sm text-gray-500">Total</span>
-                    <span id="obTotalLabel" class="text-3xl font-bold text-gray-900 tabular-nums">Rp0</span>
+                    <span id="obTotalLabel" class="text-3xl font-bold text-gray-900 tabular-nums">Rp 0</span>
                 </div>
             </div>
 
@@ -257,11 +256,11 @@
             <div class="flex border-b border-gray-200 px-8">
                 <button type="button" data-tab="cash"
                     class="obTab flex-1 py-3 text-sm font-semibold border-b-2 border-gray-900 text-gray-900 transition">
-                    Tunai
+                    Cash
                 </button>
                 <button type="button" data-tab="cashless"
                     class="obTab flex-1 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-700 transition">
-                    Non-Tunai
+                    Cashless
                 </button>
             </div>
 
@@ -275,18 +274,18 @@
 
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Uang Diterima</label>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Cash Received</label>
                                 <input type="number" name="cash_received" id="obCashReceived" min="0" required
                                     class="w-full rounded-lg border border-gray-300 p-4 text-2xl font-semibold text-center tabular-nums focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition"
                                     placeholder="0">
                             </div>
                             <div class="rounded-lg border border-gray-200 p-4">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">Kembalian</span>
-                                    <span id="obChangeDisplay" class="font-bold text-xl text-gray-900 tabular-nums">Rp0</span>
+                                    <span class="text-sm text-gray-500">Change</span>
+                                    <span id="obChangeDisplay" class="font-bold text-xl text-gray-900 tabular-nums">Rp 0</span>
                                 </div>
                                 <p id="obCashWarning" class="text-xs text-red-600 mt-2 hidden">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>Uang diterima kurang dari total.
+                                    <i class="fas fa-exclamation-circle mr-1"></i>Cash received is less than the total.
                                 </p>
                             </div>
                         </div>
@@ -296,7 +295,7 @@
                         <button type="submit" id="obCashSubmitBtn"
                             class="w-full py-3.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
                             disabled>
-                            Tagih
+                            Collect Payment
                         </button>
                     </form>
                 </div>
@@ -324,16 +323,16 @@
                         <div id="obEdcFields" class="obCashlessFields space-y-4">
                             <div class="rounded-lg border border-gray-200 p-4">
                                 <p class="text-sm text-gray-600">
-                                    Customer gesek/tap kartu di mesin EDC. Input nomor referensi dari struk untuk audit (opsional).
+                                    Customer swipes/taps card on EDC machine. Enter reference number from receipt for audit (optional).
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                                    No. Referensi EDC <span class="text-gray-400 normal-case font-normal">(opsional)</span>
+                                    EDC Reference Number <span class="text-gray-400 normal-case font-normal">(optional)</span>
                                 </label>
                                 <input type="text" name="payment_reference" maxlength="255"
                                     class="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition"
-                                    placeholder="Contoh: 123456789">
+                                    placeholder="Example: 123456789">
                             </div>
                         </div>
 
@@ -341,7 +340,7 @@
                         <div id="obQrisFields" class="obCashlessFields hidden">
                             <div class="rounded-lg border border-gray-200 p-5">
                                 <p class="text-sm text-gray-600">
-                                    QRIS dari Midtrans akan tampil setelah klik <strong>Tagih</strong>. Bill ditutup setelah QRIS dibayar.
+                                    QRIS from Midtrans will appear after clicking <strong>Collect Payment</strong>. The bill will be closed after the QRIS is paid.
                                 </p>
                                 <div class="mt-3 flex flex-wrap gap-1.5 text-xs text-gray-500">
                                     <span class="px-2 py-0.5 border border-gray-200 rounded">GoPay</span>
@@ -357,7 +356,7 @@
 
                         <button type="submit"
                             class="w-full py-3.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition">
-                            Tagih
+                            Collect Payment
                         </button>
                     </form>
                 </div>
@@ -374,7 +373,7 @@
                     <i class="fas fa-check text-green-600 text-3xl"></i>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold text-gray-800">Pembayaran Berhasil</h2>
+                    <h2 class="text-xl font-bold text-gray-800">Payment Successful</h2>
                     <p class="text-sm text-gray-500 mt-1">Order: <span class="font-mono">{{ $os['no_order'] }}</span></p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-3 text-left text-sm space-y-1">
@@ -383,16 +382,16 @@
                         <span class="font-bold">Rp{{ number_format($os['total'], 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-600">Metode</span>
+                        <span class="text-gray-600">Method</span>
                         <span class="font-bold uppercase">{{ $os['payment_method'] }}</span>
                     </div>
                     @if (! empty($os['cash_received']))
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Diterima</span>
+                            <span class="text-gray-600">Cash Received</span>
                             <span class="font-bold">Rp{{ number_format($os['cash_received'], 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Kembalian</span>
+                            <span class="text-gray-600">Change</span>
                             <span class="font-bold text-green-600">Rp{{ number_format($os['change'], 0, ',', '.') }}</span>
                         </div>
                     @endif
@@ -400,11 +399,11 @@
                 <div class="flex gap-2">
                     <a href="{{ route('order-receipt', ['id' => $os['id']]) }}" target="_blank"
                         class="flex-1 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition flex items-center justify-center gap-2">
-                        <i class="fas fa-print"></i> Cetak Struk
+                        <i class="fas fa-print"></i> Print Receipt
                     </a>
                     <button type="button" id="dismissOrderSuccess"
                         class="flex-1 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition">
-                        Selesai
+                        Done
                     </button>
                 </div>
             </div>

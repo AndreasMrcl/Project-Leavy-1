@@ -44,10 +44,10 @@
                     <p class="text-sm text-gray-500">Pantau jumlah stok &amp; lakukan penerimaan / opname.
                         Untuk tambah / edit jenis bahan, buka menu <strong>Master Bahan</strong>.</p>
                 </div>
-                <button id="opnameBtn"
-                    class="px-10 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition font-semibold flex items-center gap-2">
+                <a href="{{ route('opname') }}"
+                    class="px-10 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition font-semibold flex items-center gap-2 justify-center">
                     <i class="fas fa-clipboard-check"></i> Stock Opname
-                </button>
+                </a>
             </div>
 
             @php $lowStockCount = $invents->filter(fn($i) => $i->isLowStock())->count(); @endphp
@@ -135,7 +135,7 @@
                                                     <i class="fas fa-truck-loading"></i>
                                                 </button>
 
-                                                <form method="post" action="{{ route('delstock', ['id' => $item->id]) }}"
+                                                <form method="post" action="{{ route('delinvent', ['id' => $item->id]) }}"
                                                     class="inline deleteForm">
                                                     @csrf
                                                     @method('delete')
@@ -171,8 +171,6 @@
 
     <!-- Modals -->
     @include('modal.recStok')
-
-    @include('modal.opStok')
 
     @include('sweetalert::alert')
 

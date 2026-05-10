@@ -35,4 +35,17 @@ $(document).ready(function () {
             if (result.isConfirmed) form.submit();
         });
     });
+
+    // Close modals on backdrop click
+    $(window).click(e => {
+        if (e.target.id === 'addModal') $('#addModal').addClass('hidden');
+        if (e.target.id === 'editModal') $('#editModal').addClass('hidden');
+    });
+
+    // Close on Escape
+    $(document).on('keydown', e => {
+        if (e.key === 'Escape') {
+            $('#addModal, #editModal').addClass('hidden');
+        }
+    });
 });

@@ -120,12 +120,6 @@
                                     class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-emerald-500">
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">KTP</label>
-                                <input type="file" name="ktp" accept="image/*"
-                                    class="w-full rounded-lg border-gray-300 shadow-sm p-2 border focus:ring-2 focus:ring-emerald-500 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-slate-100 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Address</label>
                                 <textarea name="location"

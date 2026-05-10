@@ -101,10 +101,7 @@ Route::middleware(['auth:sanctum', 'ensure'])->group(function () {
 
     // INGREDIENT CONTROLLER
     Route::get('/ingridient', [IngredientController::class, 'index'])->name('ingridient');
-    Route::get('/addingridient', [IngredientController::class, 'create'])->name('addingridient');
-    Route::post('/postingridient', [IngredientController::class, 'store'])->name('postingridient');
-    Route::get('/editingridient/{id}', [IngredientController::class, 'edit'])->name('editingridient');
-    Route::put('/ingridient/{id}/update', [IngredientController::class, 'update'])->name('updateingridient');
+    Route::put('/ingridient/{id}/upsert', [IngredientController::class, 'upsert'])->name('upsertingridient');
     Route::delete('/ingridient/{id}/delete', [IngredientController::class, 'destroy'])->name('delingridient');
 
     // CATEGORY CONTROLLER

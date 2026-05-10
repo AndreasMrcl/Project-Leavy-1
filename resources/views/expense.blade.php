@@ -58,7 +58,7 @@
                                 <th class="p-4 font-bold text-center rounded-tl-lg" width="5%">No</th>
                                 <th class="p-4 font-bold text-center" width="20%">Created at</th>
                                 <th class="p-4 font-bold">Name</th>
-                                <th class="p-4 font-bold">Nominal</th>
+                                <th class="p-4 font-bold">Amount</th>
                                 <th class="p-4 font-bold text-center rounded-tr-lg" width="15%">Action</th>
                             </tr>
                         </thead>
@@ -118,139 +118,14 @@
         </div>
     </main>
 
-    <!-- ADD MODAL -->
-    <div id="addModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeAddModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-tags text-red-500"></i> Add
-            </h2>
-
-            <form id="addForm" method="post" action="{{ route('postexpense') }}" enctype="multipart/form-data"
-                class="space-y-5">
-                @csrf @method('post')
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
-                        <input type="text" name="name"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
-                            required>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nominal</label>
-                        <input type="number" name="nominal"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
-                            required>
-                    </div>
-                </div>
-                <button type="submit"
-                    class="w-full py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-yellow-600 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-check"></i> Save
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- EDIT MODAL -->
-    <div id="editModal"
-        class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
-            <button id="closeModal" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-edit text-blue-600"></i> Edit
-            </h2>
-
-            <form id="editForm" method="post" enctype="multipart/form-data" class="space-y-5">
-                @csrf @method('put')
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nama</label>
-                        <input type="text" id="editName" name="name"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                            required>
-                    </div>
-                </div>
-
-                <div class="">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nominal</label>
-                        <input type="number" id="editNominal" name="nominal"
-                            class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                            required>
-                    </div>
-                </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-save"></i> Update
-                </button>
-            </form>
-        </div>
-    </div>
+    @include('modal.addExpense')
+    @include('modal.editExpense')
 
     <!-- SCRIPTS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Init DataTable
-            new DataTable('#myTable', {});
-
-            // Modal Logic
-            const addModal = $('#addModal');
-            const editModal = $('#editModal');
-
-            $('#addBtn').click(() => addModal.removeClass('hidden'));
-            $('#closeAddModal').click(() => addModal.addClass('hidden'));
-
-            // Edit Logic
-            $(document).on('click', '.editBtn', function() {
-                const btn = $(this);
-                $('#editName').val(btn.data('name'));
-                $('#editNominal').val(btn.data('nominal'));
-
-                $('#editForm').attr('action', `/expense/${btn.data('id')}/update`);
-                editModal.removeClass('hidden');
-            });
-
-            $('#closeModal').click(() => editModal.addClass('hidden'));
-
-            $(window).click((e) => {
-                if (e.target === addModal[0]) addModal.addClass('hidden');
-                if (e.target === editModal[0]) editModal.addClass('hidden');
-            });
-
-            // Delete confirmation
-            $(document).on('click', '.delete-confirm', function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Hapus?',
-                    text: "Data akan dihapus permanen.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Hapus',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) form.submit();
-                });
-
-            });
-        });
-    </script>
+    <script src="{{ asset('modal/expense.js') }}"></script>
 
     @include('sweetalert::alert')
     @include('layout.loading')

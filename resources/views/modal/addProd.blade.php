@@ -10,7 +10,7 @@
         <h2 id="addModalTitle" class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
             <i class="fas fa-tags text-red-500"></i> Add Product
         </h2>
-        
+
         <form id="addForm" method="post" action="{{ route('postproduct') }}" enctype="multipart/form-data"
             class="space-y-5" novalidate>
             @csrf @method('post')
@@ -35,20 +35,26 @@
                 <div class="error-message hidden" id="addPriceError"></div>
             </div>
 
-            <div>
-                <label for="addCategory" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Category <span class="text-red-500">*</span>
-                </label>
-                <select id="addCategory" name="category_id"
-                    class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
-                    required aria-required="true">
-                    <option value="">Select Category</option>
-                    @foreach ($category as $item)
-                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                    @endforeach
-                </select>
-                <div class="error-message hidden" id="addCategoryError"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="addCategory" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    <select id="addCategory" name="category_id"
+                        class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                        required aria-required="true">
+                        <option value="">Select Category</option>
+                        @foreach ($category as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="error-message hidden" id="addCategoryError"></div>
+                </div>
+
+                @include('modal.varietyToggle', ['prefix' => 'add', 'accent' => 'red'])
             </div>
+
+            @include('modal.varietyChips', ['prefix' => 'add', 'accent' => 'red'])
 
             <div>
                 <label for="addImage" class="block text-sm font-semibold text-gray-700 mb-2">

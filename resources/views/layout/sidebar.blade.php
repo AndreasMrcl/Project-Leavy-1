@@ -186,4 +186,16 @@
             </div>
         </div>
     </aside>
+
+    <!-- Floating Support Button -->
+    @unless (request()->routeIs('bot'))
+        <a href="{{ route('bot') }}"
+            class="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 group"
+            title="Open Support">
+            <i class="material-icons text-2xl">support_agent</i>
+            <span class="absolute right-full mr-3 bg-gray-900 text-white text-xs font-semibold px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                Support
+            </span>
+        </a>
+    @endunless
 </div>

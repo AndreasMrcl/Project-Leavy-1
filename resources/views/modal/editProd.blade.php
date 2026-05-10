@@ -1,4 +1,4 @@
-    <!-- EDIT MODAL -->
+<!-- EDIT MODAL -->
 <div id="editModal" role="dialog" aria-labelledby="editModalTitle" aria-hidden="true"
     class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto px-4 py-6">
     <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative transform transition-all scale-100">
@@ -35,24 +35,30 @@
                 <div class="error-message hidden" id="editPriceError"></div>
             </div>
 
-            <div>
-                <label for="editCategory" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Category <span class="text-red-500">*</span>
-                </label>
-                <select id="editCategory" name="category_id"
-                    class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                    required aria-required="true">
-                    <option value="">Select Category</option>
-                    @foreach ($category as $item)
-                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                    @endforeach
-                </select>
-                <div class="error-message hidden" id="editCategoryError"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="editCategory" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    <select id="editCategory" name="category_id"
+                        class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        required aria-required="true">
+                        <option value="">Select Category</option>
+                        @foreach ($category as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="error-message hidden" id="editCategoryError"></div>
+                </div>
+
+                @include('modal.varietyToggle', ['prefix' => 'edit', 'accent' => 'blue'])
             </div>
+
+            @include('modal.varietyChips', ['prefix' => 'edit', 'accent' => 'blue', 'showRecipeWarning' => true])
 
             <div>
                 <label for="editImage" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Image
+                    Image <span class="text-gray-400 text-xs">(opsional, kosongkan untuk pertahankan gambar lama)</span>
                 </label>
                 <input type="file" id="editImage" name="img"
                     class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
@@ -63,7 +69,7 @@
                 <label for="editDesc" class="block text-sm font-semibold text-gray-700 mb-2">
                     Description <span class="text-red-500">*</span>
                 </label>
-                <textarea id="editDesc" name="desc"
+                <textarea id="editDesc" name="description"
                     class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
                     placeholder="Enter product description" rows="4" required minlength="5" maxlength="500" aria-required="true"></textarea>
                 <div class="text-gray-500 text-xs mt-1">

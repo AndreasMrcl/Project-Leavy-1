@@ -17,97 +17,169 @@
         <div class="p-6 space-y-6">
 
             <!-- Header -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                    <i class="fas fa-chart-line text-blue-500"></i> Dashboard
-                </h1>
-                <p class="text-sm text-gray-500 mt-1">
-                    Ringkasan operasi —
-                    <span class="font-semibold text-gray-700">{{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}</span>
-                </p>
+            <div
+                class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-indigo-600"></i>
+                        Dashboard
+                    </h1>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Operational Summary
+                    </p>
+                </div>
+                <div class="text-sm text-gray-500">
+                    {{ now()->format('l, d F Y') }}
+                </div>
             </div>
 
             <!-- KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
-                <!-- Pemasukan Hari Ini -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-full -mr-10 -mt-10"></div>
-                    <div class="relative">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pemasukan Hari Ini</span>
-                            <div class="bg-green-500 w-9 h-9 rounded-lg flex items-center justify-center shadow">
-                                <i class="fas fa-money-bill-wave text-white"></i>
-                            </div>
-                        </div>
-                        <p class="text-2xl font-extrabold text-gray-900 leading-tight">
-                            Rp{{ number_format($todayRevenue, 0, ',', '.') }}
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">
+                        Today's Revenue
+                    </p>
+                    <h2 class="text-2xl font-bold text-gray-800 mt-1">
+                        Rp {{ number_format($todayRevenue, 0, ',', '.') }}
+                    </h2>
+                    @if ($revenueTrend !== null)
+                        <p class="text-xs mt-2 flex items-center gap-1 {{ $revenueTrend >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
+                            <i class="fa-solid fa-arrow-{{ $revenueTrend >= 0 ? 'up' : 'down' }}"></i>
+                            {{ $revenueTrend >= 0 ? '+' : '' }}{{ $revenueTrend }}% vs yesterday
                         </p>
-                        <p class="text-xs text-gray-400 mt-1">{{ $todayOrderCount }} transaksi</p>
+                    @else
+                        <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                            <i class="fa-solid fa-receipt"></i>
+                            {{ $todayOrderCount }} transactions
+                        </p>
+                    @endif
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">
+                        Today's Orders
+                    </p>
+                    <h2 class="text-2xl font-bold text-gray-800 mt-1">
+                        {{ $todayOrderCount }}
+                    </h2>
+                    @if ($orderTrend !== null)
+                        <p class="text-xs mt-2 flex items-center gap-1 {{ $orderTrend >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
+                            <i class="fa-solid fa-arrow-{{ $orderTrend >= 0 ? 'up' : 'down' }}"></i>
+                            {{ $orderTrend >= 0 ? '+' : '' }}{{ $orderTrend }}% vs yesterday
+                        </p>
+                    @else
+                        <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check"></i>
+                            completed today
+                        </p>
+                    @endif
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">
+                        Active Orders
+                    </p>
+                    <h2 class="text-2xl font-bold text-gray-800 mt-1">
+                        {{ $activeOrderCount }}
+                    </h2>
+                    <p class="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                        <i class="fa-solid fa-clock"></i>
+                        not yet archived
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">
+                        Low Stock
+                    </p>
+                    <h2 class="text-2xl font-bold {{ $lowStock->count() > 0 ? 'text-red-600' : 'text-gray-800' }} mt-1">
+                        {{ $lowStock->count() }}
+                    </h2>
+                    <p class="text-xs {{ $lowStock->count() > 0 ? 'text-red-600' : 'text-gray-400' }} mt-2 flex items-center gap-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        needs restock
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- SUMMARY SECTION -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                <!-- Monthly Revenue -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="min-w-0">
+                            <p class="text-xs text-green-600 uppercase font-semibold tracking-wide">Monthly Revenue</p>
+                            <h3 class="text-2xl font-bold text-green-700 mt-2 truncate">
+                                Rp {{ number_format($monthlyRevenue, 0, ',', '.') }}
+                            </h3>
+                            <p class="text-xs text-green-600 mt-2">
+                                {{ now()->format('F Y') }}
+                            </p>
+                        </div>
+                        <div class="text-4xl text-green-300 opacity-50 shrink-0">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Order Hari Ini -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-10 -mt-10"></div>
-                    <div class="relative">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Order Hari Ini</span>
-                            <div class="bg-blue-500 w-9 h-9 rounded-lg flex items-center justify-center shadow">
-                                <i class="fas fa-receipt text-white"></i>
-                            </div>
+                <!-- Monthly Orders -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="min-w-0">
+                            <p class="text-xs text-blue-600 uppercase font-semibold tracking-wide">Monthly Orders</p>
+                            <h3 class="text-3xl font-bold text-blue-700 mt-2">{{ $monthlyOrderCount }}</h3>
+                            <p class="text-xs text-blue-600 mt-2">completed transactions</p>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-900 leading-tight">
-                            {{ $todayOrderCount }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-1">selesai hari ini</p>
+                        <div class="text-4xl text-blue-300 opacity-50 shrink-0">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Order Aktif -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-full -mr-10 -mt-10"></div>
-                    <div class="relative">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Order Aktif</span>
-                            <div class="bg-amber-500 w-9 h-9 rounded-lg flex items-center justify-center shadow">
-                                <i class="fas fa-clock text-white"></i>
-                            </div>
+                <!-- Monthly Expense -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="min-w-0">
+                            <p class="text-xs text-yellow-600 uppercase font-semibold tracking-wide">Monthly Expense</p>
+                            <h3 class="text-2xl font-bold text-yellow-700 mt-2 truncate">
+                                Rp {{ number_format($monthlyExpense, 0, ',', '.') }}
+                            </h3>
+                            <p class="text-xs text-yellow-600 mt-2">total spend</p>
                         </div>
-                        <p class="text-2xl font-extrabold text-gray-900 leading-tight">
-                            {{ $activeOrderCount }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-1">belum di-archive</p>
+                        <div class="text-4xl text-yellow-300 opacity-50 shrink-0">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Stok Menipis -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 {{ $lowStockCount > 0 ? 'bg-red-50' : 'bg-gray-50' }} rounded-full -mr-10 -mt-10"></div>
-                    <div class="relative">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Stok Menipis</span>
-                            <div class="{{ $lowStockCount > 0 ? 'bg-red-500' : 'bg-gray-400' }} w-9 h-9 rounded-lg flex items-center justify-center shadow">
-                                <i class="fas fa-exclamation-triangle text-white"></i>
-                            </div>
+                <!-- Monthly Customers -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="min-w-0">
+                            <p class="text-xs text-purple-600 uppercase font-semibold tracking-wide">Monthly Customers</p>
+                            <h3 class="text-3xl font-bold text-purple-700 mt-2">{{ $monthlyCustomers }}</h3>
+                            <p class="text-xs text-purple-600 mt-2">unique sessions</p>
                         </div>
-                        <p class="text-2xl font-extrabold {{ $lowStockCount > 0 ? 'text-red-600' : 'text-gray-900' }} leading-tight">
-                            {{ $lowStockCount }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-1">item perlu restock</p>
+                        <div class="text-4xl text-purple-300 opacity-50 shrink-0">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Row: Chart + Top Sellers -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
                 <!-- Revenue Chart -->
-                <div class="xl:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <div class="xl:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h2 class="font-bold text-lg text-gray-800">Pemasukan 7 Hari Terakhir</h2>
-                            <p class="text-xs text-gray-500">Total dari order settled + history</p>
+                            <h2 class="font-bold text-lg text-gray-800">Revenue Last 7 Days</h2>
+                            <p class="text-xs text-gray-500">Total from settled orders + history</p>
                         </div>
                         <div class="bg-blue-50 px-3 py-1 rounded-full">
                             <span class="text-xs font-semibold text-blue-600">
@@ -115,63 +187,23 @@
                             </span>
                         </div>
                     </div>
-                    <div style="height: 280px;">
+                    <div style="height: 260px;">
                         <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Top Sellers -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h2 class="font-bold text-lg text-gray-800">Top Menu</h2>
-                            <p class="text-xs text-gray-500">Bulan {{ \Carbon\Carbon::now()->isoFormat('MMMM') }}</p>
-                        </div>
-                        <i class="fas fa-trophy text-yellow-500"></i>
-                    </div>
-                    @if ($topSellers->isEmpty())
-                        <div class="py-10 text-center">
-                            <i class="fas fa-inbox text-gray-300 text-4xl mb-2"></i>
-                            <p class="text-sm text-gray-400">Belum ada data penjualan bulan ini.</p>
-                        </div>
-                    @else
-                        <div class="space-y-3">
-                            @foreach ($topSellers as $name => $qty)
-                                <div>
-                                    <div class="flex justify-between items-center mb-1">
-                                        <span class="text-sm font-semibold text-gray-700 truncate pr-2">
-                                            {{ $loop->iteration }}. {{ $name }}
-                                        </span>
-                                        <span class="text-xs font-bold text-blue-600 whitespace-nowrap">{{ $qty }}x</span>
-                                    </div>
-                                    <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
-                                            style="width: {{ ($qty / $topSellerMax) * 100 }}%"></div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Row: Recent Orders + Low Stock List -->
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-
-                <!-- Recent Orders -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="font-bold text-lg text-gray-800 flex items-center gap-2">
-                            <i class="fas fa-list text-blue-500"></i> Order Terbaru
+                            <i class="fas fa-list text-blue-500"></i> Recent Orders
                         </h2>
                         <a href="{{ route('order') }}" class="text-xs font-semibold text-blue-500 hover:text-blue-700">
-                            Lihat semua →
+                            View all →
                         </a>
                     </div>
                     @if ($recentOrders->isEmpty())
                         <div class="py-10 text-center">
                             <i class="fas fa-receipt text-gray-300 text-4xl mb-2"></i>
-                            <p class="text-sm text-gray-400">Belum ada order aktif.</p>
+                            <p class="text-sm text-gray-400">No active orders yet.</p>
                         </div>
                     @else
                         <div class="space-y-3">
@@ -183,11 +215,13 @@
                                         'expire', 'deny', 'cancel' => 'bg-red-100 text-red-700',
                                         default => 'bg-gray-100 text-gray-600',
                                     };
-                                    $statusLabel = $order->status ?? 'menunggu';
+                                    $statusLabel = $order->status ?? 'pending';
                                 @endphp
-                                <div class="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-gray-50 transition">
+                                <div
+                                    class="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-gray-50 transition">
                                     <div class="flex-1 min-w-0">
-                                        <p class="font-mono text-xs text-gray-500 truncate">{{ $order->no_order ?? '-' }}</p>
+                                        <p class="font-mono text-xs text-gray-500 truncate">
+                                            {{ $order->no_order ?? '-' }}</p>
                                         <p class="text-sm font-semibold text-gray-800">
                                             Rp{{ number_format($order->cart->total_amount ?? 0, 0, ',', '.') }}
                                             <span class="text-xs text-gray-400 font-normal ml-1">·
@@ -195,7 +229,8 @@
                                             </span>
                                         </p>
                                     </div>
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $statusColor }} whitespace-nowrap">
+                                    <span
+                                        class="px-2 py-1 text-xs font-semibold rounded-full {{ $statusColor }} whitespace-nowrap">
                                         {{ $statusLabel }}
                                     </span>
                                 </div>
@@ -208,17 +243,17 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="font-bold text-lg text-gray-800 flex items-center gap-2">
-                            <i class="fas fa-boxes-stacked text-red-500"></i> Stok Perlu Restock
+                            <i class="fas fa-boxes-stacked text-red-500"></i> Stock Needs Restock
                         </h2>
                         <a href="{{ route('stock') }}" class="text-xs font-semibold text-blue-500 hover:text-blue-700">
-                            Kelola stok →
+                            Manage stock →
                         </a>
                     </div>
                     @if ($lowStock->isEmpty())
                         <div class="py-10 text-center">
                             <i class="fas fa-circle-check text-green-400 text-4xl mb-2"></i>
-                            <p class="text-sm text-gray-500 font-semibold">Semua stok aman.</p>
-                            <p class="text-xs text-gray-400">Tidak ada bahan di bawah minimum.</p>
+                            <p class="text-sm text-gray-500 font-semibold">All stock is safe.</p>
+                            <p class="text-xs text-gray-400">No ingredient below minimum.</p>
                         </div>
                     @else
                         <div class="space-y-3">
@@ -229,7 +264,8 @@
                                     $textColor = $isOut ? 'text-red-700' : 'text-amber-700';
                                     $iconColor = $isOut ? 'text-red-500' : 'text-amber-500';
                                 @endphp
-                                <div class="flex justify-between items-center p-3 rounded-lg border {{ $rowBg }}">
+                                <div
+                                    class="flex justify-between items-center p-3 rounded-lg border {{ $rowBg }}">
                                     <div class="flex items-center gap-3 min-w-0">
                                         <i class="fas fa-exclamation-circle {{ $iconColor }}"></i>
                                         <div class="min-w-0">
@@ -252,6 +288,7 @@
                 </div>
             </div>
 
+
         </div>
     </main>
 
@@ -269,7 +306,7 @@
             data: {
                 labels: revenueLabels,
                 datasets: [{
-                    label: 'Pemasukan',
+                    label: 'Revenue',
                     data: revenueData,
                     borderColor: 'rgb(59, 130, 246)',
                     backgroundColor: gradient,
@@ -285,15 +322,22 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: false
+                    },
                     tooltip: {
                         backgroundColor: 'rgba(17, 24, 39, 0.95)',
                         padding: 12,
                         cornerRadius: 8,
-                        titleFont: { size: 12, weight: 'bold' },
-                        bodyFont: { size: 13 },
+                        titleFont: {
+                            size: 12,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
                         callbacks: {
-                            label: function (ctx) {
+                            label: function(ctx) {
                                 return 'Rp' + Number(ctx.parsed.y).toLocaleString('id-ID');
                             }
                         }
@@ -302,19 +346,29 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.04)' },
+                        grid: {
+                            color: 'rgba(0,0,0,0.04)'
+                        },
                         ticks: {
-                            font: { size: 11 },
-                            callback: function (v) {
-                                if (v >= 1_000_000) return 'Rp' + (v / 1_000_000).toFixed(1) + 'jt';
-                                if (v >= 1_000) return 'Rp' + (v / 1_000).toFixed(0) + 'rb';
+                            font: {
+                                size: 11
+                            },
+                            callback: function(v) {
+                                if (v >= 1_000_000) return 'Rp' + (v / 1_000_000).toFixed(1) + 'M';
+                                if (v >= 1_000) return 'Rp' + (v / 1_000).toFixed(0) + 'K';
                                 return 'Rp' + v;
                             }
                         }
                     },
                     x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 11 } }
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
                     }
                 }
             }
@@ -322,7 +376,7 @@
     </script>
 
     @include('sweetalert::alert')
-    
+
 </body>
 
 </html>

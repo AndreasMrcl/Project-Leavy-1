@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Chair;
 use App\Models\Discount;
@@ -106,6 +107,7 @@ class Pagescontroller extends Controller
         $storeId = $user->store->id;
 
         $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
         $weekStart = Carbon::today()->subDays(6);
         $monthStart = Carbon::now()->startOfMonth();
 
@@ -125,8 +127,51 @@ class Pagescontroller extends Controller
 
         $todayOrderCount = $todayActiveOrders->count() + $todayHistories->count();
 
+        // Yesterday — untuk hitung tren
+        $yesterdayActiveOrders = Order::where('store_id', $storeId)
+            ->where('status', 'settlement')
+            ->whereDate('created_at', $yesterday)
+            ->with('cart:id,total_amount')
+            ->get();
+        $yesterdayHistories = History::where('store_id', $storeId)
+            ->whereDate('created_at', $yesterday)
+            ->get(['total_amount']);
+        $yesterdayRevenue = $yesterdayActiveOrders->sum(fn ($o) => $o->cart->total_amount ?? 0)
+            + $yesterdayHistories->sum('total_amount');
+        $yesterdayOrderCount = $yesterdayActiveOrders->count() + $yesterdayHistories->count();
+
+        $revenueTrend = $yesterdayRevenue > 0
+            ? round((($todayRevenue - $yesterdayRevenue) / $yesterdayRevenue) * 100, 1)
+            : null;
+        $orderTrend = $yesterdayOrderCount > 0
+            ? round((($todayOrderCount - $yesterdayOrderCount) / $yesterdayOrderCount) * 100, 1)
+            : null;
+
         // KPI: Order aktif (semua yang belum di-archive — orders table)
         $activeOrderCount = Order::where('store_id', $storeId)->count();
+
+        // Monthly summary — untuk 4 colored cards
+        $monthlyActiveOrders = Order::where('store_id', $storeId)
+            ->where('status', 'settlement')
+            ->where('created_at', '>=', $monthStart)
+            ->with('cart:id,total_amount')
+            ->get();
+        $monthlyHistories = History::where('store_id', $storeId)
+            ->where('created_at', '>=', $monthStart)
+            ->get(['total_amount']);
+        $monthlyRevenue = $monthlyActiveOrders->sum(fn ($o) => $o->cart->total_amount ?? 0)
+            + $monthlyHistories->sum('total_amount');
+        $monthlyOrderCount = $monthlyActiveOrders->count() + $monthlyHistories->count();
+
+        $monthlyExpense = (float) Expense::where('store_id', $storeId)
+            ->where('created_at', '>=', $monthStart)
+            ->sum('nominal');
+
+        $monthlyCustomers = Cart::where('store_id', $storeId)
+            ->where('created_at', '>=', $monthStart)
+            ->whereNotNull('chair_id')
+            ->distinct('chair_id')
+            ->count('chair_id');
 
         // KPI: Stok menipis
         $lowStock = Invent::where('store_id', $storeId)
@@ -208,6 +253,12 @@ class Pagescontroller extends Controller
             'activeOrderCount',
             'lowStockCount',
             'lowStock',
+            'revenueTrend',
+            'orderTrend',
+            'monthlyRevenue',
+            'monthlyOrderCount',
+            'monthlyExpense',
+            'monthlyCustomers',
             'chartLabels',
             'chartData',
             'topSellers',

@@ -39,7 +39,7 @@
                         Result for "{{ request('search') }}"
                     </h1>
                     <p class="text-sm text-gray-500">
-                        Hasil berdasarkan kata kunci pencarian Anda di seluruh sistem
+                        Results based on your search keywords across the entire system
                     </p>
                 </div>
             </div>
@@ -49,9 +49,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-mug-saucer text-indigo-600"></i> Product
+                        <i class="fas fa-tags text-red-500"></i> Product
                     </h1>
-                    <p class="text-sm text-gray-500">Manage product / menu list</p>
+                    <p class="text-sm text-gray-500">Manage products</p>
                 </div>
                 <a href="{{ route('product') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -97,7 +97,7 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-tags text-pink-600"></i> Category
+                        <i class="fas fa-tags text-red-500"></i> Category
                     </h1>
                     <p class="text-sm text-gray-500">Manage product categories</p>
                 </div>
@@ -134,9 +134,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-boxes-stacked text-amber-600"></i> Bahan / Inventory
+                        <i class="fas fa-tags text-red-500"></i> Stock Ingridient
                     </h1>
-                    <p class="text-sm text-gray-500">Stok bahan baku</p>
+                    <p class="text-sm text-gray-500">Stock of ingredients</p>
                 </div>
                 <a href="{{ route('invent') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -150,9 +150,9 @@
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
                                 <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Nama Bahan</th>
-                                <th class="p-4 font-bold text-center">Stok</th>
-                                <th class="p-4 font-bold text-center">Min. Stok</th>
+                                <th class="p-4 font-bold">Stock Name</th>
+                                <th class="p-4 font-bold text-center">Stock</th>
+                                <th class="p-4 font-bold text-center">Min. Stock</th>
                                 <th class="p-4 font-bold text-center">Status</th>
                             </tr>
                         </thead>
@@ -189,9 +189,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-receipt text-cyan-600"></i> Order Aktif
+                        <i class="fas fa-tags text-red-500"></i> Active Order
                     </h1>
-                    <p class="text-sm text-gray-500">Order yang belum di-archive</p>
+                    <p class="text-sm text-gray-500">Order that has not been archived</p>
                 </div>
                 <a href="{{ route('order') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -205,9 +205,9 @@
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
                                 <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Tanggal</th>
-                                <th class="p-4 font-bold">Atas Nama</th>
-                                <th class="p-4 font-bold">No. Telpon</th>
+                                <th class="p-4 font-bold">Date</th>
+                                <th class="p-4 font-bold">Customer Name</th>
+                                <th class="p-4 font-bold">Phone Number</th>
                                 <th class="p-4 font-bold text-center">Status</th>
                                 <th class="p-4 font-bold text-right">Total</th>
                             </tr>
@@ -243,9 +243,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-clock-rotate-left text-purple-600"></i> Riwayat Order
+                        <i class="fas fa-tags text-red-500"></i> Order History
                     </h1>
-                    <p class="text-sm text-gray-500">Order yang sudah selesai / di-archive</p>
+                    <p class="text-sm text-gray-500">Orders that have been completed / archived</p>
                 </div>
                 <a href="{{ route('history') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -259,9 +259,9 @@
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
                                 <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Tanggal</th>
-                                <th class="p-4 font-bold">Nama Pelanggan</th>
-                                <th class="p-4 font-bold">Akun</th>
+                                <th class="p-4 font-bold">Date</th>
+                                <th class="p-4 font-bold">Customer Name</th>
+                                <th class="p-4 font-bold">Account</th>
                                 <th class="p-4 font-bold text-right">Total</th>
                             </tr>
                         </thead>
@@ -290,9 +290,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-percent text-rose-600"></i> Diskon
+                        <i class="fas fa-tags text-red-500"></i> Discount
                     </h1>
-                    <p class="text-sm text-gray-500">Kelola diskon dan promo</p>
+                    <p class="text-sm text-gray-500">Manage discount and promo</p>
                 </div>
                 <a href="{{ route('discount') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -306,8 +306,8 @@
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
                                 <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Nama Diskon</th>
-                                <th class="p-4 font-bold text-right">Nominal / Persen</th>
+                                <th class="p-4 font-bold">Discount Name</th>
+                                <th class="p-4 font-bold text-right">Amount / Percentage</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-700 text-sm divide-y divide-gray-200">
@@ -331,9 +331,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-wallet text-red-600"></i> Pengeluaran
+                        <i class="fas fa-tags text-red-500"></i> Expense
                     </h1>
-                    <p class="text-sm text-gray-500">Catatan pengeluaran toko</p>
+                    <p class="text-sm text-gray-500">Store expense records</p>
                 </div>
                 <a href="{{ route('expense') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -347,9 +347,9 @@
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
                                 <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Tanggal</th>
-                                <th class="p-4 font-bold">Nama</th>
-                                <th class="p-4 font-bold text-right">Nominal</th>
+                                <th class="p-4 font-bold">Date</th>
+                                <th class="p-4 font-bold">Name</th>
+                                <th class="p-4 font-bold text-right">Amount</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-700 text-sm divide-y divide-gray-200">
@@ -376,9 +376,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-store text-emerald-600"></i> Showcase
+                        <i class="fas fa-tags text-red-500"></i> Showcase
                     </h1>
-                    <p class="text-sm text-gray-500">Etalase / paket produk</p>
+                    <p class="text-sm text-gray-500">Showcase / product package</p>
                 </div>
                 <a href="{{ route('showcase') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -392,7 +392,7 @@
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
                                 <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Nama Showcase</th>
+                                <th class="p-4 font-bold">Showcase Name</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-700 text-sm divide-y divide-gray-200">
@@ -413,9 +413,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-chair text-blue-600"></i> Customer / Meja
+                        <i class="fas fa-tags text-red-500"></i> Customer / Chair
                     </h1>
-                    <p class="text-sm text-gray-500">Daftar meja / customer dengan QR</p>
+                    <p class="text-sm text-gray-500">List of chairs / customers with QR codes</p>
                 </div>
                 <a href="{{ route('chair') }}"
                     class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
@@ -429,7 +429,7 @@
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
                                 <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Nama</th>
+                                <th class="p-4 font-bold">Customer Name</th>
                                 <th class="p-4 font-bold">Email</th>
                             </tr>
                         </thead>
