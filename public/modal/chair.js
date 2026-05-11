@@ -5,7 +5,7 @@ $(document).ready(function () {
     // ========== Modal open/close ==========
     const addModal = $('#addModal');
 
-    $('#addBtn').click(() => addModal.removeClass('hidden'));
+    $('#addBtn, #emptyAddBtn').click(() => addModal.removeClass('hidden'));
     $('#closeAddModal').click(() => addModal.addClass('hidden'));
 
     // Close on backdrop click

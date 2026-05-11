@@ -54,67 +54,86 @@
             <!-- Table Section -->
             <div class="w-full bg-white rounded-xl shadow-md border border-gray-100">
                 <div class="p-5 overflow-auto">
-                    <table id="myTable" class="w-full text-left">
-                        <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
-                            <tr>
-                                <th class="p-4 font-bold text-center rounded-tl-lg" width="5%">No</th>
-                                <th class="p-4 font-bold text-center" width="20%">Created at</th>
-                                <th class="p-4 font-bold">Name</th>
-                                <th class="p-4 font-bold">Percentage</th>
-                                <th class="p-4 font-bold text-center rounded-tr-lg" width="15%">Action</th>
-                            </tr>
-                        </thead>
 
-                        <tbody class="text-gray-700 text-sm">
-                            @php $no = 1; @endphp
-                            @foreach ($discounts as $item)
-                                <tr class="hover:bg-gray-50 transition duration-150">
-                                    <td class="p-4 font-medium text-center">{{ $no++ }}</td>
+                     @if ($discounts->isEmpty())
 
-                                    <td class="p-4 font-medium text-center">
-                                        {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
-                                    </td>
+                        <!-- Empty State -->
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <div class="text-gray-400 mb-4">
+                                <i class="fas fa-inbox text-6xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-600 mb-2">No discounts yet</h3>
+                            <p class="text-gray-500 mb-6">Get started by creating your first discount</p>
+                            <button id="emptyAddBtn" aria-label="Add first discount"
+                                class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold flex items-center gap-2">
+                                <i class="fas fa-plus"></i> Create Discount
+                            </button>
+                        </div>
 
-                                    <td class="p-4">
-                                        <span class="font-semibold text-gray-800">
-                                            {{ $item->name }}
-                                        </span>
-                                    </td>
+                    @else
 
-                                    <td class="p-4">
-                                        <span class="font-semibold text-gray-800">
-                                            {{ $item->percentage }}%
-                                        </span>
-                                    </td>
-
-                                    <td class="p-4">
-                                        <div class="flex justify-center items-center gap-2">
-                                            <button
-                                                class="editBtn w-9 h-9 flex items-center justify-center bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 hover:scale-105 transition"
-                                                data-id="{{ $item->id }}" data-name="{{ $item->name }}" data-percentage="{{ $item->percentage }}"
-                                                title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-
-                                            <form method="post"
-                                                action="{{ route('deldiscount', ['id' => $item->id]) }}"
-                                                class="inline deleteForm">
-                                                @csrf
-                                                @method('delete')
-                                                <button type="button"
-                                                    class="delete-confirm w-9 h-9 flex items-center justify-center bg-red-500 text-white rounded-lg shadow hover:bg-red-600 hover:scale-105 transition"
-                                                    title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
+                        <table id="myTable" class="w-full text-left">
+                            <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
+                                <tr>
+                                    <th class="p-4 font-bold text-center rounded-tl-lg" width="5%">No</th>
+                                    <th class="p-4 font-bold text-center" width="20%">Created at</th>
+                                    <th class="p-4 font-bold">Name</th>
+                                    <th class="p-4 font-bold">Percentage</th>
+                                    <th class="p-4 font-bold text-center rounded-tr-lg" width="15%">Action</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
+                            </thead>
+
+                            <tbody class="text-gray-700 text-sm">
+                                @php $no = 1; @endphp
+                                @foreach ($discounts as $item)
+                                    <tr class="hover:bg-gray-50 transition duration-150">
+                                        <td class="p-4 font-medium text-center">{{ $no++ }}</td>
+
+                                        <td class="p-4 font-medium text-center">
+                                            {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
+                                        </td>
+
+                                        <td class="p-4">
+                                            <span class="font-semibold text-gray-800">
+                                                {{ $item->name }}
+                                            </span>
+                                        </td>
+
+                                        <td class="p-4">
+                                            <span class="font-semibold text-gray-800">
+                                                {{ $item->percentage }}%
+                                            </span>
+                                        </td>
+
+                                        <td class="p-4">
+                                            <div class="flex justify-center items-center gap-2">
+                                                <button
+                                                    class="editBtn w-9 h-9 flex items-center justify-center bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 hover:scale-105 transition"
+                                                    data-id="{{ $item->id }}" data-name="{{ $item->name }}" data-percentage="{{ $item->percentage }}"
+                                                    title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+
+                                                <form method="post"
+                                                    action="{{ route('deldiscount', ['id' => $item->id]) }}"
+                                                    class="inline deleteForm">
+                                                    @csrf
+                                                    @method('delete')
+                                                    <button type="button"
+                                                        class="delete-confirm w-9 h-9 flex items-center justify-center bg-red-500 text-white rounded-lg shadow hover:bg-red-600 hover:scale-105 transition"
+                                                        title="Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
 
 
-                    </table>
+                        </table>
+                    @endif
                 </div>
             </div>
         </div>

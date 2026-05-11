@@ -6,7 +6,7 @@ $(document).ready(function () {
     const editModal = $('#editModal');
 
     // ========== Modal open/close ==========
-    $('#addBtn').click(() => addModal.removeClass('hidden'));
+    $('#addBtn, #emptyAddBtn').click(() => addModal.removeClass('hidden'));
     $('#closeAddModal').click(() => addModal.addClass('hidden'));
     $('#closeModal').click(() => editModal.addClass('hidden'));
 

@@ -54,6 +54,23 @@
                 </a>
             </div>
 
+            @if ($invents->isEmpty())
+                <div class="bg-white rounded-xl shadow-md border border-gray-100">
+                    <div class="p-5">
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <div class="text-gray-400 mb-4">
+                                <i class="fas fa-inbox text-6xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-600 mb-2">No ingredients yet</h3>
+                            <p class="text-gray-500 mb-6">Add an ingredient first via <strong>Master Ingredient</strong> before doing a stock opname.</p>
+                            <a href="{{ route('invent') }}" aria-label="Add first ingredient"
+                                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center gap-2">
+                                <i class="fas fa-plus"></i> Add Ingredient
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @else
             <form id="opnameForm" method="post" action="{{ route('opnameinvent') }}" class="space-y-6">
                 @csrf
 
@@ -157,6 +174,7 @@
                     </div>
                 </div>
             </form>
+            @endif
         </div>
     </main>
 
@@ -166,6 +184,7 @@
     <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
+            if (!document.getElementById('opnameForm')) return; // empty state, skip JS
             const table = new DataTable('#myTable', {
                 ordering: false,
                 pageLength: 25,

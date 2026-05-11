@@ -126,6 +126,22 @@
             <!-- Table Section -->
             <div class="w-full bg-white rounded-xl shadow-md border border-gray-100">
                 <div class="p-5 overflow-auto">
+
+                    @if ($orders->isEmpty())
+                        <!-- Empty State -->
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <div class="text-gray-400 mb-4">
+                                <i class="fas fa-inbox text-6xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-600 mb-2">No active orders</h3>
+                            <p class="text-gray-500 mb-6">Create a new order to start serving customers</p>
+                            <a href="{{ route('addorder') }}" aria-label="Create first order"
+                                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold flex items-center gap-2">
+                                <i class="fas fa-plus"></i> Create Order
+                            </a>
+                        </div>
+                    @else
+
                     <table id="myTable" class="w-full text-left">
                         <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
                             <tr>
@@ -229,6 +245,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    @endif
                 </div>
             </div>
         </div>
