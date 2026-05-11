@@ -6,7 +6,7 @@
             <i class="fas fa-times text-xl"></i>
         </button>
         <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-            <i class="fas fa-tags text-red-500"></i> Add
+            <i class="fas fa-tags text-red-500"></i> Add Chair
         </h2>
 
         <form id="addForm" method="post" action="{{ route('postchair') }}" enctype="multipart/form-data"
@@ -14,7 +14,7 @@
             @csrf @method('post')
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
                 <input type="text" name="name"
                     class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-yellow-500"
                     required>
