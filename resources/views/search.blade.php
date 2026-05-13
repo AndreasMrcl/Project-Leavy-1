@@ -326,51 +326,6 @@
                 </div>
             </div>
 
-            <!-- EXPENSE -->
-            <div
-                class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
-                <div>
-                    <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-tags text-red-500"></i> Expense
-                    </h1>
-                    <p class="text-sm text-gray-500">Store expense records</p>
-                </div>
-                <a href="{{ route('expense') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
-                    <i class="fa fa-external-link"></i> Go to Page
-                </a>
-            </div>
-
-            <div class="w-full bg-white rounded-xl shadow-md border border-gray-100">
-                <div class="p-5 overflow-auto">
-                    <table id="expenseTable" class="w-full text-left">
-                        <thead class="bg-gray-100 text-gray-600 text-sm leading-normal">
-                            <tr>
-                                <th class="p-4 font-bold rounded-tl-lg text-center" width="5%">No</th>
-                                <th class="p-4 font-bold">Date</th>
-                                <th class="p-4 font-bold">Name</th>
-                                <th class="p-4 font-bold text-right">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-700 text-sm divide-y divide-gray-200">
-                            @php $no = 1; @endphp
-                            @foreach ($expenses as $item)
-                                <tr class="hover:bg-gray-50 transition duration-150">
-                                    <td class="p-4 font-medium text-center">{{ $no++ }}</td>
-                                    <td class="p-4 font-medium">
-                                        {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
-                                    </td>
-                                    <td class="p-4 font-bold text-gray-900">{{ $item->name }}</td>
-                                    <td class="p-4 font-mono text-right text-slate-600">
-                                        Rp {{ number_format($item->nominal ?? 0, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- SHOWCASE -->
             <div
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
@@ -462,7 +417,6 @@
             new DataTable('#orderTable', {});
             new DataTable('#historyTable', {});
             new DataTable('#discountTable', {});
-            new DataTable('#expenseTable', {});
             new DataTable('#showcaseTable', {});
             new DataTable('#chairTable', {});
         });

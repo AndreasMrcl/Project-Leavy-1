@@ -11,7 +11,6 @@ use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\PagesController as CustomerPagesController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\DiscountController;
-use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\InventController;
@@ -127,12 +126,6 @@ Route::middleware(['auth:sanctum', 'ensure'])->group(function () {
     Route::put('/discount/{id}/update', [DiscountController::class, 'update'])->name('updatediscount');
     Route::delete('/discount/{id}/delete', [DiscountController::class, 'destroy'])->name('deldiscount');
 
-    // EXPENSE CONTROLLER
-    Route::get('/expense', [ExpenseController::class, 'index'])->name('expense');
-    Route::post('/postexpense', [ExpenseController::class, 'store'])->name('postexpense');
-    Route::put('/expense/{id}/update', [ExpenseController::class, 'update'])->name('updateexpense');
-    Route::delete('/expense/{id}/delete', [ExpenseController::class, 'destroy'])->name('delexpense');
-
     // SETTLEMENT CONTROLLER
     Route::get('/settlement', [SettlementController::class, 'index'])->name('settlement');
     Route::get('/settlement/{id}/show', [SettlementController::class, 'show'])->name('showsettlement');
@@ -143,7 +136,7 @@ Route::middleware(['auth:sanctum', 'ensure'])->group(function () {
     Route::post('/createtotal', [SettlementController::class, 'posttotal'])->name('posttotal');
 
     // CONSULT
-    Route::get('/bot', [ChatController::class, 'bot'])->name('bot');
+    Route::get('/chats', [ChatController::class, 'chats'])->name('chats');
     Route::post('/gen', [ChatController::class, 'gen'])->name('gen');
 });
 

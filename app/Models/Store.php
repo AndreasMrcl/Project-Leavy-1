@@ -68,11 +68,6 @@ class Store extends Model
         return $this->hasMany(Showcase::class);
     }
 
-    public function expenses()
-    {
-        return $this->hasMany(Expense::class);
-    }
-
     public function activityLogs()
     {
         return $this->hasMany(ActivityLog::class);

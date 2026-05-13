@@ -110,32 +110,12 @@
                     </li>
                     <li class="p-4 mx-2">
                         <div class="ml-16 md:ml-14">
-                            <a href="{{ route('expense') }}">
-                                <h1 class="text-gray-500 hover:text-black text-base font-normal">Expense</h1>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="p-4 mx-2">
-                        <div class="ml-16 md:ml-14">
                             <a href="{{ route('history') }}">
                                 <h1 class="text-gray-500 hover:text-black text-base font-normal">History</h1>
                             </a>
                         </div>
                     </li>
                     <hr class="mx-5 shadow-2xl text-gray-100 rounded-xl" />
-                    <li class="p-4 mx-2">
-                        <a class="" href="{{ route('bot') }}">
-                            <div class="flex space-x-4">
-                                <div class="bg-red-600 p-2 rounded-xl">
-                                    <i class="material-icons text-white">support_agent</i>
-                                </div>
-                                <div class="my-auto">
-                                    <h1 class="text-gray-500 hover:text-black text-base font-normal">Support
-                                    </h1>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
 
                     <!-- Logs -->
                     <li class="p-4 mx-2">
@@ -187,15 +167,5 @@
         </div>
     </aside>
 
-    <!-- Floating Support Button -->
-    @unless (request()->routeIs('bot'))
-        <a href="{{ route('bot') }}"
-            class="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 group"
-            title="Open Support">
-            <i class="material-icons text-2xl">support_agent</i>
-            <span class="absolute right-full mr-3 bg-gray-900 text-white text-xs font-semibold px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                Support
-            </span>
-        </a>
-    @endunless
+    @include('layout.floatingChat')
 </div>

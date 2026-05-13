@@ -105,7 +105,7 @@
             </div>
 
             <!-- SUMMARY SECTION -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
                 <!-- Monthly Revenue -->
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
@@ -135,22 +135,6 @@
                         </div>
                         <div class="text-4xl text-blue-300 opacity-50 shrink-0">
                             <i class="fa-solid fa-receipt"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Monthly Expense -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex items-center justify-between">
-                        <div class="min-w-0">
-                            <p class="text-xs text-yellow-600 uppercase font-semibold tracking-wide">Monthly Expense</p>
-                            <h3 class="text-2xl font-bold text-yellow-700 mt-2 truncate">
-                                Rp {{ number_format($monthlyExpense, 0, ',', '.') }}
-                            </h3>
-                            <p class="text-xs text-yellow-600 mt-2">total spend</p>
-                        </div>
-                        <div class="text-4xl text-yellow-300 opacity-50 shrink-0">
-                            <i class="fa-solid fa-money-bill-wave"></i>
                         </div>
                     </div>
                 </div>

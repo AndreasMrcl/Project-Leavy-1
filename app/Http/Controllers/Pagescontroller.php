@@ -6,7 +6,6 @@ use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Chair;
 use App\Models\Discount;
-use App\Models\Expense;
 use App\Models\History;
 use App\Models\Invent;
 use App\Models\Menu;
@@ -163,10 +162,6 @@ class Pagescontroller extends Controller
             + $monthlyHistories->sum('total_amount');
         $monthlyOrderCount = $monthlyActiveOrders->count() + $monthlyHistories->count();
 
-        $monthlyExpense = (float) Expense::where('store_id', $storeId)
-            ->where('created_at', '>=', $monthStart)
-            ->sum('nominal');
-
         $monthlyCustomers = Cart::where('store_id', $storeId)
             ->where('created_at', '>=', $monthStart)
             ->whereNotNull('chair_id')
@@ -257,7 +252,6 @@ class Pagescontroller extends Controller
             'orderTrend',
             'monthlyRevenue',
             'monthlyOrderCount',
-            'monthlyExpense',
             'monthlyCustomers',
             'chartLabels',
             'chartData',
@@ -287,7 +281,6 @@ class Pagescontroller extends Controller
         $orders = Order::with(['cart'])->where('store_id', $userStore->id);
         $histories = History::where('store_id', $userStore->id);
         $discounts = Discount::where('store_id', $userStore->id);
-        $expenses = Expense::where('store_id', $userStore->id);
         $showcases = Showcase::where('store_id', $userStore->id);
         $chairs = Chair::where('store_id', $userStore->id);
 
@@ -316,8 +309,6 @@ class Pagescontroller extends Controller
 
             $discounts->where('name', 'LIKE', "%{$search}%");
 
-            $expenses->where('name', 'LIKE', "%{$search}%");
-
             $showcases->where('name', 'LIKE', "%{$search}%");
 
             $chairs->where(function ($q) use ($search) {
@@ -333,7 +324,6 @@ class Pagescontroller extends Controller
             'orders'     => $orders->get(),
             'histories'  => $histories->get(),
             'discounts'  => $discounts->get(),
-            'expenses'   => $expenses->get(),
             'showcases'  => $showcases->get(),
             'chairs'     => $chairs->get(),
         ]);

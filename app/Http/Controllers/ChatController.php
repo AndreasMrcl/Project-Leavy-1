@@ -16,30 +16,24 @@ use Throwable;
 
 class ChatController extends Controller
 {
-    public function bot()
+    public function chats()
     {
-
         if (! Auth::check()) {
-            return redirect('/');
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store?->id;
 
-        if (! $userStore) {
-            return redirect()->route('addstore');
+        if (! $storeId) {
+            return response()->json(['chats' => []]);
         }
 
-        $status = $userStore->status;
-
-        if ($status !== 'Settlement') {
-            return redirect()->route('login');
-        }
-
-        $chats = Chat::orderBy('created_at', 'asc')
+        $chats = Chat::where('store_id', $storeId)
+            ->orderBy('created_at', 'asc')
             ->take(50)
-            ->get();
+            ->get(['prompt', 'response']);
 
-        return view('bot', compact('chats'));
+        return response()->json(['chats' => $chats]);
     }
 
     public function gen(Request $request)
