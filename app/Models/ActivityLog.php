@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ActivityLog extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -26,11 +27,6 @@ class ActivityLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
     }
 
     public function getCreatedAtFormattedAttribute()

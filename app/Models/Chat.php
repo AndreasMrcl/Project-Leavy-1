@@ -2,19 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Model;
 
 class Chat extends Model
 {
-    protected $fillable =
-        [
-            'store_id',
-            'prompt',
-            'response',
-        ];
+    use BelongsToStore;
 
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
+    protected $fillable = [
+        'store_id',
+        'prompt',
+        'response',
+    ];
 }

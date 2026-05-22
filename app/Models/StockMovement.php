@@ -2,29 +2,24 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StockMovement extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
-    protected $fillable =
-        [
-            'store_id',
-            'invent_id',
-            'user_id',
-            'quantity',
-            'type',
-            'reference_type',
-            'reference_id',
-            'notes',
-        ];
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
+    protected $fillable = [
+        'store_id',
+        'invent_id',
+        'user_id',
+        'quantity',
+        'type',
+        'reference_type',
+        'reference_id',
+        'notes',
+    ];
 
     public function invent()
     {

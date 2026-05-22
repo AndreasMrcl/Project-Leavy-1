@@ -2,28 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class Chair extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use BelongsToStore, HasApiTokens, Notifiable;
 
-    protected $fillable =
-        [
-            'store_id',
-            'name',
-            'email',
-            'password',
-            'qr_token',
-            'device_id',
-        ];
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
+    protected $fillable = [
+        'store_id',
+        'name',
+        'email',
+        'password',
+        'qr_token',
+        'device_id',
+    ];
 
     public function carts()
     {

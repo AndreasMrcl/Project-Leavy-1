@@ -12,69 +12,51 @@ class DiscountController extends Controller
 {
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        
+        $cacheKey = "discount_{$storeId}";
 
-        $cacheKey = "discount_{$userStore->id}";
-
-        $discounts = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->discounts()->get();
-        });
+        $discounts = Cache::remember($cacheKey, 180, fn () => Discount::all());
 
         return view('discount', compact('discounts'));
     }
 
     public function store(Request $request)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'name' => 'required',
             'percentage' => 'required',
         ]);
 
-        $data['store_id'] = $userStore->id;
-
-        $discount = Discount::create([
-            'name' => $data['name'],
-            'percentage' => $data['percentage'],
-            'store_id' => $userStore->id,
-        ]);
+        $discount = Discount::create($data);
 
         $this->logActivity(
             'Create Discount',
             "Adding new discount: {$discount->name} ({$discount->percentage}%)",
-            $userStore->id
+            $discount->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($discount->store_id);
 
         return redirect(route('discount'))->with('success', 'Discount successfully created!');
     }
 
     public function update(Request $request, $id)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'name' => 'required',
             'percentage' => 'required',
         ]);
 
-        $discount = Discount::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $discount = Discount::findOrFail($id);
 
         $old = [
             'name' => $discount->name,
             'percentage' => $discount->percentage,
         ];
 
-        $discount->update([
-            'name' => $data['name'],
-            'percentage' => $data['percentage'],
-        ]);
+        $discount->update($data);
 
-        // Detect what changed
         $changes = [];
         foreach ($data as $field => $value) {
             if ($old[$field] != $value) {
@@ -85,37 +67,29 @@ class DiscountController extends Controller
 
         if ($changes) {
             $desc = "Update Discount '{$discount->name}': ".implode(', ', $changes);
-            $this->logActivity('Update Discount', $desc, $userStore->id);
+            $this->logActivity('Update Discount', $desc, $discount->store_id);
         }
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($discount->store_id);
 
-        return redirect(route('discount'))->with('success', 'Discount Sukses Diupdate !');
+        return redirect(route('discount'))->with('success', 'Discount successfully updated!');
     }
 
     public function destroy($id)
     {
-        $userStore = Auth::user()->store;
-
-        $discount = Discount::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->first();
+        $discount = Discount::find($id);
 
         if (! $discount) {
             return redirect(route('discount'))->withErrors(['msg' => 'Discount tidak ditemukan.']);
         }
 
         $name = $discount->name;
+        $storeId = $discount->store_id;
 
         $discount->delete();
 
-        $this->logActivity(
-            'Delete Discount',
-            "Deleting discount: {$name}",
-            $userStore->id
-        );
-
-        $this->clearCache($userStore->id);
+        $this->logActivity('Delete Discount', "Deleting discount: {$name}", $storeId);
+        $this->clearCache($storeId);
 
         return redirect(route('discount'))->with('success', 'Discount successfully deleted!');
     }

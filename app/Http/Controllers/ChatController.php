@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Chat;
 use App\Models\History;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use League\CommonMark\CommonMarkConverter;
@@ -18,18 +17,7 @@ class ChatController extends Controller
 {
     public function chats()
     {
-        if (! Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        $storeId = Auth::user()->store?->id;
-
-        if (! $storeId) {
-            return response()->json(['chats' => []]);
-        }
-
-        $chats = Chat::where('store_id', $storeId)
-            ->orderBy('created_at', 'asc')
+        $chats = Chat::orderBy('created_at', 'asc')
             ->take(50)
             ->get(['prompt', 'response']);
 
@@ -110,7 +98,6 @@ class ChatController extends Controller
     private function saveChat(string $prompt, string $response): void
     {
         Chat::create([
-            'store_id' => Auth::user()->store->id,
             'prompt' => $prompt,
             'response' => $response,
         ]);

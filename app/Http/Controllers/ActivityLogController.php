@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -9,21 +10,14 @@ class ActivityLogController extends Controller
 {
     public function index()
     {
-        if (! Auth::check()) {
-            return redirect('/');
-        }
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "activities_{$storeId}";
 
-        $userStore = Auth::user()->store;
-
-        if (! $userStore) {
-            return redirect()->route('addstore');
-        }
-
-        $cacheKey = "activities_{$userStore->id}";
-
-        $logs = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->activityLogs()->with('user')->latest()->get();
-        });
+        $logs = Cache::remember(
+            $cacheKey,
+            180,
+            fn () => ActivityLog::with('user')->latest()->get()
+        );
 
         return view('activityLog', compact('logs'));
     }

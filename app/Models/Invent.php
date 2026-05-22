@@ -2,32 +2,27 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Invent extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
-    protected $fillable =
-        [
-            'store_id',
-            'name',
-            'stock',
-            'min_stock',
-            'unit',
-        ];
+    protected $fillable = [
+        'store_id',
+        'name',
+        'stock',
+        'min_stock',
+        'unit',
+    ];
 
     public function menus()
     {
         return $this->belongsToMany(Menu::class, 'invent_menus')
             ->withPivot('quantity_used')
             ->withTimestamps();
-    }
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
     }
 
     public function scopeLowStock($query)

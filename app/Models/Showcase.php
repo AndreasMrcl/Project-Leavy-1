@@ -2,22 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Showcase extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
-    protected $fillable =
-        [
-            'store_id',
-            'name',
-            'img',
-        ];
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
+    protected $fillable = [
+        'store_id',
+        'name',
+        'img',
+    ];
 }

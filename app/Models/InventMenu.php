@@ -2,21 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class InventMenu extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
-    protected $fillable =
-        [
-            'store_id',
-            'menu_id',
-            'invent_id',
-            'variety',
-            'quantity_used',
-        ];
+    protected $fillable = [
+        'store_id',
+        'menu_id',
+        'invent_id',
+        'variety',
+        'quantity_used',
+    ];
 
     public function menu()
     {

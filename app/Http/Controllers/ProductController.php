@@ -16,32 +16,27 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "menu_{$storeId}";
 
-        $cacheKey = "menu_{$userStore->id}";
-
-        $category = Category::where('store_id', $userStore->id)->get();
-
-        $menuAll = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->menus()->with('category')->get();
-        });
+        $category = Category::all();
+        $menuAll = Cache::remember($cacheKey, 180, fn () => Menu::with('category')->get());
 
         return view('product', compact('category', 'menuAll'));
     }
 
     public function store(Request $request)
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
 
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'price' => 'required|numeric|min:0',
             'img' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'required|string|max:500',
-            'category_id' => 'required|exists:categories,id,store_id,' . $userStore->id,
+            'category_id' => 'required|exists:categories,id,store_id,'.$storeId,
         ] + $this->varietyRules());
 
         $hasVariety = $request->boolean('has_variety');
@@ -54,10 +49,9 @@ class ProductController extends Controller
         $menu = Menu::create([
             'name' => $data['name'],
             'price' => $data['price'],
-            'img' => 'img/' . $imageName,
+            'img' => 'img/'.$imageName,
             'description' => $data['description'],
             'category_id' => $data['category_id'],
-            'store_id' => $userStore->id,
             'has_variety' => $hasVariety,
             'varieties' => $varieties,
         ]);
@@ -66,41 +60,35 @@ class ProductController extends Controller
             'Create Product',
             "Adding new product: {$menu->name} (Rp ".number_format($menu->price, 0, ',', '.').')'
                 .($hasVariety ? ' with varieties: '.implode(', ', $varieties) : ''),
-            $userStore->id
+            $menu->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($menu->store_id);
 
         return redirect(route('product'))->with('success', 'Product successfully created!');
     }
 
     public function show($id)
     {
-        $menu = Cache::remember("menu_{$id}", now()->addMinutes(60), function () use ($id) {
-            return Menu::find($id);
-        });
-        $discount = Cache::remember('discounts', now()->addMinutes(60), function () {
-            return Discount::all();
-        });
+        $menu = Cache::remember("menu_{$id}", now()->addMinutes(60), fn () => Menu::findOrFail($id));
+        $discount = Cache::remember('discounts', now()->addMinutes(60), fn () => Discount::all());
 
         return view('showproduct', compact('menu', 'discount'));
     }
 
     public function update(Request $request, $id)
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
 
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'price' => 'required|numeric|min:0',
             'description' => 'required|string|max:500',
-            'category_id' => 'required|exists:categories,id,store_id,' . $userStore->id,
+            'category_id' => 'required|exists:categories,id,store_id,'.$storeId,
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ] + $this->varietyRules());
 
-        $menu = Menu::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $menu = Menu::findOrFail($id);
 
         $hasVariety = $request->boolean('has_variety');
         $newVarieties = $this->resolveVarieties($request);
@@ -124,10 +112,9 @@ class ProductController extends Controller
             $uploadedImage = $request->file('img');
             $imageName = $uploadedImage->getClientOriginalName();
             $uploadedImage->storeAs('img', $imageName, 'public');
-            $payload['img'] = 'img/' . $imageName;
+            $payload['img'] = 'img/'.$imageName;
         }
 
-        // Variety cleanup: silent delete pivot untuk variety yang dihapus
         $removedVarieties = [];
         if ($oldHasVariety && ! $hasVariety) {
             $removedVarieties = $oldVarieties;
@@ -146,10 +133,10 @@ class ProductController extends Controller
         $menu->update($payload);
 
         if ($diff) {
-            $this->logActivity('Update Product', "Update Product '{$menu->name}': ".implode(', ', $diff), $userStore->id);
+            $this->logActivity('Update Product', "Update Product '{$menu->name}': ".implode(', ', $diff), $menu->store_id);
         }
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($menu->store_id);
 
         $message = 'Product successfully updated!';
         if ($deletedRecipeRows > 0) {
@@ -158,6 +145,31 @@ class ProductController extends Controller
         }
 
         return redirect(route('product'))->with('success', $message);
+    }
+
+    public function destroy($id)
+    {
+        $menu = Menu::find($id);
+
+        if (! $menu) {
+            return redirect(route('product'))->withErrors(['msg' => 'Product not found.']);
+        }
+
+        CartMenu::where('menu_id', $menu->id)->delete();
+
+        if ($menu->img && Storage::disk('public')->exists($menu->img)) {
+            Storage::disk('public')->delete($menu->img);
+        }
+
+        $name = $menu->name;
+        $storeId = $menu->store_id;
+
+        $menu->delete();
+
+        $this->logActivity('Delete Product', "Deleting product: {$name}", $storeId);
+        $this->clearCache($storeId);
+
+        return redirect()->route('product')->with('success', 'Product successfully deleted!');
     }
 
     private function varietyRules(): array
@@ -202,41 +214,6 @@ class ProductController extends Controller
             }
         }
         return $diff;
-    }
-
-    public function destroy($id)
-    {
-        $userStore = Auth::user()->store;
-
-        $menu = Menu::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->first();
-
-        if (! $menu) {
-            return redirect(route('product'))->withErrors(['msg' => 'Product not found.']);
-        }
-
-        // hapus relasi cart_menu
-        CartMenu::where('menu_id', $id)->delete();
-
-        // hapus file img dari storage
-        if ($menu->img && Storage::disk('public')->exists($menu->img)) {
-            Storage::disk('public')->delete($menu->img);
-        }
-
-        $name = $menu->name;
-
-        $menu->delete();
-
-        $this->logActivity(
-            'Delete Product',
-            "Deleting product: {$name}",
-            $userStore->id
-        );
-
-        $this->clearCache($userStore->id);
-
-        return redirect()->route('product')->with('success', 'Product successfully deleted!');
     }
 
     private function clearCache(int $storeId): void

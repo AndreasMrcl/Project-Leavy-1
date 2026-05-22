@@ -15,34 +15,31 @@ class IngredientController extends Controller
 {
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "ingridient_{$storeId}";
 
-        $cacheKey = "ingridient_{$userStore->id}";
+        $menus = Cache::remember($cacheKey, 180, fn () => Menu::with(['invents'])->get());
 
-        $menus = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->menus()->with(['invents'])->get();
-        });
-
-        $invents = Invent::where('store_id', $userStore->id)->orderBy('name')->get();
+        $invents = Invent::orderBy('name')->get();
 
         return view('ingridient', compact('menus', 'invents'));
     }
 
     public function upsert(Request $request, $id)
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
 
         $request->validate([
             'ingredients' => 'required|array|min:1',
             'ingredients.*' => 'required|array|min:1',
             'ingredients.*.*.invent_id' => [
                 'required',
-                Rule::exists('invents', 'id')->where('store_id', $userStore->id),
+                Rule::exists('invents', 'id')->where('store_id', $storeId),
             ],
             'ingredients.*.*.quantity_used' => 'required|numeric|min:0.01',
         ]);
 
-        $menu = Menu::where('store_id', $userStore->id)->findOrFail($id);
+        $menu = Menu::findOrFail($id);
 
         $allowedVarieties = $menu->has_variety ? ($menu->varieties ?? ['normal']) : ['normal'];
 
@@ -56,7 +53,6 @@ class IngredientController extends Controller
             }
             foreach ($rows as $ingredient) {
                 InventMenu::create([
-                    'store_id' => $userStore->id,
                     'menu_id' => $menu->id,
                     'invent_id' => $ingredient['invent_id'],
                     'variety' => $variety,
@@ -67,11 +63,11 @@ class IngredientController extends Controller
 
         $this->logActivity(
             $existed ? 'Update Ingredient' : 'Create Ingredient',
-            ($existed ? 'Updating' : 'Adding') . " ingredient recipe for product: {$menu->name}",
-            $userStore->id
+            ($existed ? 'Updating' : 'Adding')." ingredient recipe for product: {$menu->name}",
+            $menu->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($menu->store_id);
 
         return redirect(route('ingridient'))->with(
             'success',
@@ -81,21 +77,17 @@ class IngredientController extends Controller
 
     public function destroy($id)
     {
-        $userStore = Auth::user()->store;
-
-        $menu = Menu::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $menu = Menu::findOrFail($id);
 
         InventMenu::where('menu_id', $menu->id)->delete();
 
         $this->logActivity(
             'Delete Ingredient',
             "Deleting ingredient recipe for product: {$menu->name}",
-            $userStore->id
+            $menu->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($menu->store_id);
 
         return redirect(route('ingridient'))->with('success', 'Ingredients successfully deleted!');
     }

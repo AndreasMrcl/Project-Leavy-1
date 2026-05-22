@@ -14,66 +14,59 @@ class SettlementController extends Controller
 {
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "settlement_{$storeId}";
 
-        $cacheKey = "settlement_{$userStore->id}";
-
-        $settlements = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->settlements()->get();
-        });
+        $settlements = Cache::remember($cacheKey, 180, fn () => Settlement::all());
 
         return view('settlement', compact('settlements'));
     }
 
     public function poststart(Request $request)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'start_amount' => 'nullable|numeric',
         ]);
 
-        $user = auth()->user();
-
+        $user = Auth::user();
         $activeShift = $user->settlements()->active()->first();
 
         if ($activeShift) {
             return redirect(route('settlement'))->with('error', "The previous shift hasn't closed yet. Please close it before opening a new shift.");
         }
 
-        $data['store_id'] = $userStore->id;
         $data['start_time'] = Carbon::now()->toDateTimeString();
         $data['expected'] = $data['start_amount'] ?? 0;
 
-        $user->settlements()->create($data);
+        $settlement = $user->settlements()->create($data);
 
         $this->logActivity(
             'Open Shift',
             'Opening shift with initial cash: Rp '.number_format($data['expected'] ?? 0, 0, ',', '.'),
-            $userStore->id
+            $settlement->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($settlement->store_id);
 
         return redirect(route('settlement'))->with('success', 'New settlement created successfully!');
     }
 
     public function posttotal(Request $request)
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
 
         $data = $request->validate([
             'total_amount' => 'nullable|numeric',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $activeShift = $user->settlements()->active()->first();
 
         if (! $activeShift) {
             return redirect(route('settlement'))->with('error', 'There is no active shift that can be closed.');
         }
 
-        $openBillCount = Cart::openBills()->where('store_id', $userStore->id)->count();
+        $openBillCount = Cart::openBills()->where('store_id', $storeId)->count();
         if ($openBillCount > 0) {
             return redirect(route('settlement'))->with('error', "Cannot close shift: there are still {$openBillCount} open bills. Please settle or cancel them first on the Order page.");
         }
@@ -84,10 +77,10 @@ class SettlementController extends Controller
         $this->logActivity(
             'Close Shift',
             'Closing shift with total cash: Rp '.number_format($data['total_amount'] ?? 0, 0, ',', '.'),
-            $userStore->id
+            $storeId
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($storeId);
 
         Cache::forget("settlement_{$activeShift->id}");
 
@@ -99,7 +92,7 @@ class SettlementController extends Controller
         $settlement = Cache::remember(
             "settlement_{$id}",
             now()->addMinutes(60),
-            fn() => Settlement::with('history')->findOrFail($id)
+            fn () => Settlement::with('histories')->findOrFail($id)
         );
 
         return view('showsettlement', compact('settlement'));
@@ -107,18 +100,14 @@ class SettlementController extends Controller
 
     public function destroy($id)
     {
-        $userStore = Auth::user()->store;
-
         $settlement = Settlement::findOrFail($id);
+        $storeId = $settlement->store_id;
+
         $settlement->delete();
 
-        $this->logActivity(
-            'Delete Settlement',
-            "Deleting settlement #{$id}",
-            $userStore->id
-        );
+        $this->logActivity('Delete Settlement', "Deleting settlement #{$id}", $storeId);
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($storeId);
         Cache::forget("settlement_{$id}");
 
         return redirect(route('settlement'))->with('success', 'Settlement deleted successfully!');

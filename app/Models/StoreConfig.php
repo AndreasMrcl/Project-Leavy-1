@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StoreConfig extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
     protected $fillable = [
         'store_id',
@@ -30,9 +31,4 @@ class StoreConfig extends Model
         'min_stock_alert' => 'integer',
         'auto_archive_days' => 'integer',
     ];
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
 }

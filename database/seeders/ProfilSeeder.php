@@ -13,7 +13,7 @@ class ProfilSeeder extends Seeder
     public function run(): void
     {
         User::firstOrCreate(
-            ['email' => 'admin@gmail.com'],
+            ['email' => 'admin2@gmail.com'],
             [
                 'name' => 'Admin',
                 'password' => bcrypt('123456'),

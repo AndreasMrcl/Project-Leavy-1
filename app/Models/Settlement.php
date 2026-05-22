@@ -2,28 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Settlement extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
-    protected $fillable =
-        [
-            'store_id',
-            'user_id',
-            'start_time',
-            'end_time',
-            'start_amount',
-            'total_amount',
-            'expected',
-        ];
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
+    protected $fillable = [
+        'store_id',
+        'user_id',
+        'start_time',
+        'end_time',
+        'start_amount',
+        'total_amount',
+        'expected',
+    ];
 
     public function user()
     {

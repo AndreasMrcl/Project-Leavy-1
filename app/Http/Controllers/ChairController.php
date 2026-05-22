@@ -15,31 +15,25 @@ class ChairController extends Controller
 {
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "chair_{$storeId}";
 
-        $cacheKey = "chair_{$userStore->id}";
-
-        $chairs = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->chairs()->get();
-        });
+        $chairs = Cache::remember($cacheKey, 180, fn () => Chair::all());
 
         return view('chair', compact('chairs'));
     }
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        $userStore = Auth::user()->store;
-
-        $emailSlug = Str::slug($validatedData['name']);
+        $emailSlug = Str::slug($data['name']);
         $uniqueEmail = $emailSlug . '-' . Str::random(6) . '@chair.local';
 
         $chair = Chair::create([
-            'store_id' => $userStore->id,
-            'name' => $validatedData['name'],
+            'name' => $data['name'],
             'email' => $uniqueEmail,
             'password' => bcrypt('123456'),
             'qr_token' => Str::random(32),
@@ -47,13 +41,8 @@ class ChairController extends Controller
 
         $token = $chair->createToken('auth_token')->plainTextToken;
 
-        $this->logActivity(
-            'Create Chair',
-            "Adding new chair: {$chair->name}",
-            $userStore->id
-        );
-
-        $this->clearCache($userStore->id);
+        $this->logActivity('Create Chair', "Adding new chair: {$chair->name}", $chair->store_id);
+        $this->clearCache($chair->store_id);
 
         return redirect()
             ->route('chair')
@@ -63,11 +52,7 @@ class ChairController extends Controller
 
     public function qr(int $id)
     {
-        $userStore = Auth::user()->store;
-
-        $chair = Chair::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $chair = Chair::findOrFail($id);
 
         $signinUrl = route('signin', ['qrToken' => $chair->qr_token]);
 
@@ -76,29 +61,22 @@ class ChairController extends Controller
 
     public function destroy(int $id)
     {
-        $userStore = Auth::user()->store;
-
-        $chair = Chair::where('id', $id)
-            ->firstOrFail();
+        $chair = Chair::findOrFail($id);
 
         Order::whereHas(
             'cart',
-            fn($query) => $query->where('chair_id', $chair->id)
+            fn ($query) => $query->where('chair_id', $chair->id)
         )->delete();
 
         Cart::where('chair_id', $chair->id)->delete();
 
         $name = $chair->name;
+        $storeId = $chair->store_id;
 
         $chair->delete();
 
-        $this->logActivity(
-            'Delete Chair',
-            "Deleting chair: {$name}",
-            $userStore->id
-        );
-
-        $this->clearCache($userStore->id);
+        $this->logActivity('Delete Chair', "Deleting chair: {$name}", $storeId);
+        $this->clearCache($storeId);
 
         return redirect()
             ->route('chair')

@@ -12,21 +12,10 @@ class StoreConfigController extends Controller
 {
     public function index()
     {
-        if (! Auth::check()) {
-            return redirect('/');
-        }
-
         $userStore = Auth::user()->store;
-
-        if (! $userStore) {
-            return redirect()->route('addstore');
-        }
-
         $cacheKey = "store_config_{$userStore->id}";
 
-        $config = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->storeConfig;
-        });
+        $config = Cache::remember($cacheKey, 180, fn () => $userStore->storeConfig);
 
         if (! $config) {
             $config = new StoreConfig;
@@ -73,12 +62,7 @@ class StoreConfigController extends Controller
             ]
         );
 
-        $this->logActivity(
-            'Update Config',
-            'Updating store configuration',
-            $userStore->id
-        );
-
+        $this->logActivity('Update Config', 'Updating store configuration', $userStore->id);
         $this->clearCache($userStore->id);
 
         return redirect()->back()->with('success', 'Store configuration updated successfully!');

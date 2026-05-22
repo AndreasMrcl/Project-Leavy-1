@@ -14,21 +14,16 @@ class InventController extends Controller
 {
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "invents_{$storeId}";
 
-        $cacheKey = "invents_{$userStore->id}";
-
-        $invents = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->invents()->get();
-        });
+        $invents = Cache::remember($cacheKey, 180, fn () => Invent::all());
 
         return view('invent', compact('invents'));
     }
 
     public function store(Request $request)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'name' => 'required|string',
             'unit' => 'required',
@@ -36,9 +31,8 @@ class InventController extends Controller
             'initial_stock' => 'nullable|integer|min:0',
         ]);
 
-        $newInvent = DB::transaction(function () use ($data, $userStore) {
+        $newInvent = DB::transaction(function () use ($data) {
             $invent = Invent::create([
-                'store_id' => $userStore->id,
                 'name' => $data['name'],
                 'unit' => $data['unit'],
                 'min_stock' => $data['min_stock'] ?? 0,
@@ -49,7 +43,7 @@ class InventController extends Controller
             if ($initial > 0) {
                 $invent->increment('stock', $initial);
                 StockMovement::create([
-                    'store_id' => $userStore->id,
+                    'store_id' => $invent->store_id,
                     'invent_id' => $invent->id,
                     'user_id' => Auth::id(),
                     'quantity' => $initial,
@@ -64,27 +58,23 @@ class InventController extends Controller
         $this->logActivity(
             'Create Invent',
             "Adding new ingredient: {$newInvent->name} (Initial stock: ".(int) ($data['initial_stock'] ?? 0)." {$newInvent->unit})",
-            $userStore->id
+            $newInvent->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($newInvent->store_id);
 
         return redirect(route('invent'))->with('success', 'Ingredient successfully added!');
     }
 
     public function update(Request $request, $id)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'name' => 'required|string',
             'unit' => 'required',
             'min_stock' => 'nullable|integer|min:0',
         ]);
 
-        $invent = Invent::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $invent = Invent::findOrFail($id);
 
         $old = [
             'name' => $invent->name,
@@ -100,7 +90,6 @@ class InventController extends Controller
 
         $invent->update($new);
 
-        // Detect what changed
         $changes = [];
         foreach ($new as $field => $value) {
             if ($old[$field] != $value) {
@@ -111,37 +100,29 @@ class InventController extends Controller
 
         if ($changes) {
             $desc = "Update Invent '{$invent->name}': ".implode(', ', $changes);
-            $this->logActivity('Update Invent', $desc, $userStore->id);
+            $this->logActivity('Update Invent', $desc, $invent->store_id);
         }
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($invent->store_id);
 
         return redirect(route('invent'))->with('success', 'Ingredient successfully updated!');
     }
 
     public function destroy($id)
     {
-        $userStore = Auth::user()->store;
-
-        $invent = Invent::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->first();
+        $invent = Invent::find($id);
 
         if (! $invent) {
             return redirect(route('invent'))->withErrors(['msg' => 'Bahan tidak ditemukan.']);
         }
 
         $name = $invent->name;
+        $storeId = $invent->store_id;
 
         $invent->delete();
 
-        $this->logActivity(
-            'Delete Invent',
-            "Deleting ingredient: {$name}",
-            $userStore->id
-        );
-
-        $this->clearCache($userStore->id);
+        $this->logActivity('Delete Invent', "Deleting ingredient: {$name}", $storeId);
+        $this->clearCache($storeId);
 
         return redirect(route('invent'))->with('success', 'Ingredient successfully deleted!');
     }

@@ -12,70 +12,50 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "category_{$storeId}";
 
-        $cacheKey = "category_{$userStore->id}";
-
-        $category = Cache::remember($cacheKey, 180, function () use ($userStore) {
-
-            return $userStore->categories()->get();
-        });
+        $category = Cache::remember($cacheKey, 180, fn () => Category::all());
 
         return view('category', compact('category'));
     }
 
     public function store(Request $request)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'name' => 'required|string',
             'desc' => 'required|string',
         ]);
 
-        $data['store_id'] = $userStore->id;
-
-        $category = Category::create([
-            'name' => $data['name'],
-            'desc' => $data['desc'],
-            'store_id' => $userStore->id,
-        ]);
+        $category = Category::create($data);
 
         $this->logActivity(
             'Create Category',
             "Adding new categories: {$category->name}",
-            $userStore->id
+            $category->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($category->store_id);
 
         return redirect(route('category'))->with('success', 'Category successfully created!');
     }
 
     public function update(Request $request, $id)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'name' => 'required|string',
             'desc' => 'required|string',
         ]);
 
-        $category = Category::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $category = Category::findOrFail($id);
 
         $old = [
             'name' => $category->name,
             'desc' => $category->desc,
         ];
 
-        $category->update([
-            'name' => $data['name'],
-            'desc' => $data['desc'],
-        ]);
+        $category->update($data);
 
-        // Detect what changed
         $changes = [];
         foreach ($data as $field => $value) {
             if ($old[$field] != $value) {
@@ -85,38 +65,30 @@ class CategoryController extends Controller
         }
 
         if ($changes) {
-            $desc = "Update Category '{$category->name}': " . implode(', ', $changes);
-            $this->logActivity('Update Category', $desc, $userStore->id);
+            $desc = "Update Category '{$category->name}': ".implode(', ', $changes);
+            $this->logActivity('Update Category', $desc, $category->store_id);
         }
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($category->store_id);
 
         return redirect(route('category'))->with('success', 'Category successfully updated!');
     }
 
     public function destroy($id)
     {
-        $userStore = Auth::user()->store;
-
-        $category = Category::where('id', $id)
-            ->where('store_id', $userStore->id)
-            ->first();
+        $category = Category::find($id);
 
         if (! $category) {
             return redirect(route('category'))->withErrors(['msg' => 'Category not found.']);
         }
 
         $name = $category->name;
+        $storeId = $category->store_id;
 
         $category->delete();
 
-        $this->logActivity(
-            'Delete Category',
-            "Deleting category: {$name}",
-            $userStore->id
-        );
-
-        $this->clearCache($userStore->id);
+        $this->logActivity('Delete Category', "Deleting category: {$name}", $storeId);
+        $this->clearCache($storeId);
 
         return redirect(route('category'))->with('success', 'Category successfully deleted!');
     }

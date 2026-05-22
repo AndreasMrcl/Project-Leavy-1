@@ -2,34 +2,29 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
-    use HasFactory;
+    use BelongsToStore, HasFactory;
 
-    protected $fillable =
-        [
-            'store_id',
-            'name',
-            'price',
-            'img',
-            'description',
-            'category_id',
-            'has_variety',
-            'varieties',
-        ];
+    protected $fillable = [
+        'store_id',
+        'name',
+        'price',
+        'img',
+        'description',
+        'category_id',
+        'has_variety',
+        'varieties',
+    ];
 
     protected $casts = [
         'has_variety' => 'boolean',
         'varieties' => 'array',
     ];
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
 
     public function cartMenus()
     {

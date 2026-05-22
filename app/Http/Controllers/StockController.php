@@ -14,36 +14,29 @@ class StockController extends Controller
 {
     public function index()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "stock_{$storeId}";
 
-        $cacheKey = "stock_{$userStore->id}";
-
-        $invents = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->invents()->orderBy('name')->get();
-        });
+        $invents = Cache::remember($cacheKey, 180, fn () => Invent::orderBy('name')->get());
 
         return view('stok', compact('invents'));
     }
 
     public function receive(Request $request)
     {
-        $userStore = Auth::user()->store;
-
         $data = $request->validate([
             'invent_id' => 'required|exists:invents,id',
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string|max:255',
         ]);
 
-        $invent = Invent::where('id', $data['invent_id'])
-            ->where('store_id', $userStore->id)
-            ->firstOrFail();
+        $invent = Invent::findOrFail($data['invent_id']);
 
-        DB::transaction(function () use ($invent, $data, $userStore) {
+        DB::transaction(function () use ($invent, $data) {
             $invent->increment('stock', $data['quantity']);
 
             StockMovement::create([
-                'store_id' => $userStore->id,
+                'store_id' => $invent->store_id,
                 'invent_id' => $invent->id,
                 'user_id' => Auth::id(),
                 'quantity' => $data['quantity'],
@@ -55,30 +48,27 @@ class StockController extends Controller
         $this->logActivity(
             'Stock Receive',
             "Receiving stock {$invent->name}: +{$data['quantity']} {$invent->unit}",
-            $userStore->id
+            $invent->store_id
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($invent->store_id);
 
         return redirect(route('stock'))->with('success', "Receiving {$data['quantity']} {$invent->unit} {$invent->name} successful!");
     }
 
     public function opnameForm()
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
+        $cacheKey = "stock_{$storeId}";
 
-        $cacheKey = "stock_{$userStore->id}";
-
-        $invents = Cache::remember($cacheKey, 180, function () use ($userStore) {
-            return $userStore->invents()->orderBy('name')->get();
-        });
+        $invents = Cache::remember($cacheKey, 180, fn () => Invent::orderBy('name')->get());
 
         return view('opname', compact('invents'));
     }
 
     public function opname(Request $request)
     {
-        $userStore = Auth::user()->store;
+        $storeId = Auth::user()->store->id;
 
         $data = $request->validate([
             'reason' => 'required|string|max:255',
@@ -87,8 +77,7 @@ class StockController extends Controller
             'items.*.actual_stock' => 'nullable|integer|min:0',
         ]);
 
-        $invents = Invent::where('store_id', $userStore->id)
-            ->whereIn('id', collect($data['items'])->pluck('invent_id'))
+        $invents = Invent::whereIn('id', collect($data['items'])->pluck('invent_id'))
             ->get()
             ->keyBy('id');
 
@@ -119,12 +108,12 @@ class StockController extends Controller
             return redirect(route('stock'))->with('info', 'No stock changes detected, nothing to adjust.');
         }
 
-        DB::transaction(function () use ($changes, $data, $userStore) {
+        DB::transaction(function () use ($changes, $data, $storeId) {
             foreach ($changes as $change) {
                 $change['invent']->update(['stock' => $change['actual_stock']]);
 
                 StockMovement::create([
-                    'store_id' => $userStore->id,
+                    'store_id' => $storeId,
                     'invent_id' => $change['invent']->id,
                     'user_id' => Auth::id(),
                     'quantity' => $change['delta'],
@@ -140,10 +129,10 @@ class StockController extends Controller
         $this->logActivity(
             'Stock Opname',
             'Stock opname: '.count($changes)." item(s) adjusted (+{$totalUp} / {$totalDown}). Reason: {$data['reason']}",
-            $userStore->id
+            $storeId
         );
 
-        $this->clearCache($userStore->id);
+        $this->clearCache($storeId);
 
         return redirect(route('stock'))->with('success', 'Stock opname successful: '.count($changes).' item(s) adjusted.');
     }
@@ -151,7 +140,6 @@ class StockController extends Controller
     private function clearCache($storeId)
     {
         Cache::forget("stock_{$storeId}");
-        
         Cache::forget("invents_{$storeId}");
     }
 
