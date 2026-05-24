@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ChairResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            'id'         => $this->id,
+            'name'       => $this->name,
+            'updated_at' => optional($this->updated_at)->toIso8601String(),
+        ];
+    }
+}
