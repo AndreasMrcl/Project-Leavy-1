@@ -58,7 +58,7 @@
 
             <div>
                 <label for="editImage" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Image <span class="text-gray-400 text-xs">(opsional, kosongkan untuk pertahankan gambar lama)</span>
+                    Image <span class="text-gray-400 text-xs">(optional, leave empty to keep the previous image)</span>
                 </label>
                 <input type="file" id="editImage" name="img"
                     class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">

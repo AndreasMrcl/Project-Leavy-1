@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (pageLoading) {
                     pageLoading.classList.remove('hidden');
                 }
-                return; // stop di sini, jangan pakai spinner tombol
+                return; // stop here, do not use the button spinner
             }
 
             /* ===============================

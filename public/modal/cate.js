@@ -23,14 +23,14 @@ $(document).ready(function () {
         e.preventDefault();
         const form = $(this).closest('form');
         Swal.fire({
-            title: 'Hapus?',
-            text: 'Data akan dihapus permanen.',
+            title: 'Delete?',
+            text: 'Data will be permanently deleted.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Ya, Hapus',
-            cancelButtonText: 'Batal'
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel'
         }).then(result => result.isConfirmed && form.submit());
     });
 

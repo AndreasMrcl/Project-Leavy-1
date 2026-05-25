@@ -1,7 +1,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="description" content="Nikmati pengalaman memesan kopi murah dan enak di Sivinaries Coffee. Pesan sekarang melalui aplikasi kami untuk berbagai pilihan kopi berkualitas dengan harga terjangkau.">
-<meta name="keywords" content="kopi murah, kopi enak, aplikasi kopi, pesan kopi online, Sivinaries Coffee, kopi berkualitas, kopi terbaik">
+<meta name="description" content="Enjoy the experience of ordering affordable, delicious coffee at Sivinaries Coffee. Order now through our app for a wide range of quality coffee at affordable prices.">
+<meta name="keywords" content="affordable coffee, delicious coffee, coffee app, order coffee online, Sivinaries Coffee, quality coffee, best coffee">
 <meta name="author" content="Sivinaries Coffee">
 <meta name="robots" content="index, follow">
 <link rel="icon" sizes="76x76" href="{{ asset('logo.png') }}" />
@@ -17,7 +17,7 @@
 
 <!-- Social Media Metadata -->
 <meta property="og:title" content="Sivinaries Coffee - Aplikasi Pemesanan Kopi Murah dan Enak">
-<meta property="og:description" content="Nikmati kopi murah dan enak melalui aplikasi Sivinaries Coffee. Pesan sekarang dan temukan berbagai pilihan kopi terbaik!">
+<meta property="og:description" content="Enjoy affordable, delicious coffee through the Sivinaries Coffee app. Order now and discover the best coffee selection!">
 <meta property="og:image" content="{{ asset('logo.png') }}">
 
 {{-- <meta property="og:url" content="https://sivinaries.my.id/"> --}}

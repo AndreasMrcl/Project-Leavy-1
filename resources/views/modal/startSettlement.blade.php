@@ -13,7 +13,7 @@
             @csrf @method('post')
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Modal Awal (Rp) <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Starting Cash (Rp) <span class="text-red-500">*</span></label>
                 <input type="number" name="start_amount" min="0" step="1"
                     class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-red-500"
                     placeholder="0"

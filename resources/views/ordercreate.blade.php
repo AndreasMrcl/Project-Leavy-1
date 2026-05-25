@@ -15,32 +15,32 @@
         <div class="p-6 space-y-6">
 
             <!-- Header Section -->
-            <div class="flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+            <div class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     @if ($mode === 'append')
                         <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                            <i class="fas fa-utensils text-amber-500"></i> Tambah ke Bill
+                            <i class="fas fa-utensils text-amber-500"></i> Add to Bill
                         </h1>
-                        <p class="text-sm text-gray-500">Mode: tambah item ke bill <span class="font-semibold text-amber-600">Meja {{ $cart->chair->name ?? '-' }}</span>. Klik <strong>Simpan ke Bill</strong> setelah selesai.</p>
+                        <p class="text-sm text-gray-500 mt-1">Mode: add items to <span class="font-bold text-amber-600">Table {{ $cart->chair->name ?? '-' }}</span>'s bill. Click <strong>Save to Bill</strong> when done.</p>
                     @else
                         <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                            <i class="fas fa-cash-register text-blue-500"></i> Buat Order Baru
+                            <i class="fas fa-cash-register text-blue-500"></i> Create New Order
                         </h1>
-                        <p class="text-sm text-gray-500">Pilih menu, atur detail, lalu klik Payment.</p>
+                        <p class="text-sm text-gray-500 mt-1">Select a menu, set details, then click Payment.</p>
                     @endif
                 </div>
                 <a href="{{ route('order') }}"
-                    class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300 transition font-semibold flex items-center gap-2">
-                    <i class="fas fa-arrow-left"></i> Kembali
+                    class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
+                    <i class="fas fa-arrow-left"></i> Back
                 </a>
             </div>
 
             @if ($mode === 'append')
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
+                <div class="bg-amber-50 border-l-4 border-amber-500 rounded-lg p-4 flex items-center gap-3 shadow-sm">
                     <i class="fas fa-info-circle text-amber-600 text-xl"></i>
-                    <p class="text-sm text-amber-800">
-                        Item yang ditambah akan masuk ke <strong>bill terbuka</strong> Meja {{ $cart->chair->name ?? '-' }}.
-                        Stok belum dikurangi sampai bill ditagih.
+                    <p class="text-sm text-amber-800 font-bold">
+                        Items added will go into Table {{ $cart->chair->name ?? '-' }}'s <strong>open bill</strong>.
+                        Stock is not deducted until the bill is settled.
                     </p>
                 </div>
             @endif
@@ -51,8 +51,8 @@
                 <!-- LEFT: Menu Grid -->
                 <div class="lg:col-span-3 bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
                     <div class="flex items-center gap-2">
-                        <h3 class="font-semibold text-gray-700">Pilih Produk</h3>
-                        <input type="text" id="menuSearch" placeholder="Cari menu..."
+                        <h3 class="font-bold text-gray-700">Select Product</h3>
+                        <input type="text" id="menuSearch" placeholder="Search menu..."
                             class="flex-1 rounded-lg border-gray-300 shadow-sm p-2 border text-sm focus:ring-2 focus:ring-blue-500">
                     </div>
 
@@ -89,7 +89,7 @@
 
                 <!-- RIGHT: Cart Panel -->
                 <div class="lg:col-span-2 bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
-                    <h3 class="font-semibold text-gray-700">Keranjang</h3>
+                    <h3 class="font-bold text-gray-700">Cart</h3>
                     <div class="bg-gray-50 rounded-xl p-3 space-y-2 max-h-[50vh] overflow-y-auto min-h-[12rem]">
                         @forelse ($cart->cartMenus as $item)
                             <div class="flex items-start gap-2 bg-white rounded-lg p-2 shadow-sm">
@@ -123,15 +123,15 @@
                         @empty
                             <div class="text-center py-8 text-gray-400 text-sm">
                                 <i class="fas fa-shopping-cart text-3xl block mb-2"></i>
-                                Keranjang masih kosong
+                                Cart is empty
                             </div>
                         @endforelse
                     </div>
 
                     <div class="border-t pt-3 space-y-3">
                         <div class="flex justify-between items-center">
-                            <span class="font-semibold text-gray-700">Total</span>
-                            <span class="font-bold text-2xl text-gray-900">
+                            <span class="font-bold text-gray-700">Total</span>
+                            <span class="font-mono font-bold text-2xl text-gray-900">
                                 Rp{{ number_format($cart->total_amount, 0, ',', '.') }}
                             </span>
                         </div>
@@ -139,11 +139,11 @@
                         @if ($mode === 'append')
                             <a href="{{ route('order') }}"
                                 class="w-full py-3 bg-amber-500 text-white font-bold rounded-lg shadow-md hover:bg-amber-600 transition flex justify-center items-center gap-2">
-                                <i class="fas fa-save"></i> Simpan ke Bill
+                                <i class="fas fa-save"></i> Save to Bill
                             </a>
                         @else
                             <button type="button" id="paymentBtn"
-                                class="w-full py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition flex justify-center items-center gap-2 {{ $cart->cartMenus->isEmpty() ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                class="w-full py-3 bg-emerald-500 text-white font-bold rounded-lg shadow-md hover:bg-emerald-600 transition flex justify-center items-center gap-2 {{ $cart->cartMenus->isEmpty() ? 'opacity-50 cursor-not-allowed' : '' }}"
                                 {{ $cart->cartMenus->isEmpty() ? 'disabled' : '' }}>
                                 <i class="fas fa-money-bill-wave"></i> Payment
                             </button>
@@ -180,7 +180,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jumlah</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Quantity</label>
                     <div class="flex items-center justify-between gap-2 bg-gray-50 rounded-lg p-2">
                         <button type="button" id="qtyDecr"
                             class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 active:scale-95 transition">
@@ -196,19 +196,19 @@
                 </div>
 
                 <div id="varietyWrap" class="hidden">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Variety</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Variety</label>
                     <select name="variety" id="varietySelect"
                         class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500">
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Diskon
-                        <span class="text-gray-400 text-xs">(opsional)</span>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Discount
+                        <span class="text-gray-400 text-xs">(optional)</span>
                     </label>
                     <select name="discount_id"
                         class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500">
-                        <option value="">Tanpa Diskon</option>
+                        <option value="">No Discount</option>
                         @foreach ($discounts as $disc)
                             <option value="{{ $disc->id }}">{{ $disc->name }} ({{ $disc->percentage }}%)</option>
                         @endforeach
@@ -216,12 +216,12 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Catatan
-                        <span class="text-gray-400 text-xs">(opsional)</span>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Notes
+                        <span class="text-gray-400 text-xs">(optional)</span>
                     </label>
                     <input type="text" name="notes" maxlength="255"
                         class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500"
-                        placeholder="Mis: extra hot, no straw">
+                        placeholder="e.g.: extra hot, no straw">
                 </div>
 
                 <button type="submit"
@@ -243,7 +243,7 @@
 
             <!-- Header -->
             <div class="px-8 pt-7 pb-5 border-b border-gray-100">
-                <h2 class="text-base font-semibold text-gray-500 uppercase tracking-wider">Pembayaran</h2>
+                <h2 class="text-base font-semibold text-gray-500 uppercase tracking-wider">Payment</h2>
                 <div class="mt-2 flex items-baseline gap-2">
                     <span class="text-sm text-gray-500">Total</span>
                     <span class="text-3xl font-bold text-gray-900 tabular-nums">Rp{{ number_format($cart->total_amount, 0, ',', '.') }}</span>
@@ -254,11 +254,11 @@
             <div class="flex border-b border-gray-200 px-8">
                 <button type="button" data-tab="cash"
                     class="paymentTab flex-1 py-3 text-sm font-semibold border-b-2 border-gray-900 text-gray-900 transition">
-                    Tunai
+                    Cash
                 </button>
                 <button type="button" data-tab="cashless"
                     class="paymentTab flex-1 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-700 transition">
-                    Non-Tunai
+                    Cashless
                 </button>
                 <button type="button" data-tab="openbill"
                     class="paymentTab flex-1 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-700 transition">
@@ -268,7 +268,7 @@
 
             <!-- Tab content area -->
             <div class="flex-1 overflow-y-auto px-8 py-6">
-                <!-- Tunai -->
+                <!-- Cash -->
                 <div id="cashTab" class="paymentTabContent h-full">
                     <form method="post" action="{{ route('checkout') }}" class="flex flex-col h-full">
                         @csrf
@@ -276,7 +276,7 @@
 
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Uang Diterima</label>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Cash Received</label>
                                 <input type="number" name="cash_received" id="cashReceived" min="0" required
                                     class="w-full rounded-lg border border-gray-300 p-4 text-2xl font-semibold text-center tabular-nums focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition"
                                     placeholder="0">
@@ -284,11 +284,11 @@
 
                             <div class="rounded-lg border border-gray-200 p-4">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">Kembalian</span>
+                                    <span class="text-sm text-gray-500">Change</span>
                                     <span id="changeDisplay" class="font-bold text-xl text-gray-900 tabular-nums">Rp0</span>
                                 </div>
                                 <p id="cashWarning" class="text-xs text-red-600 mt-2 hidden">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>Uang diterima kurang dari total.
+                                    <i class="fas fa-exclamation-circle mr-1"></i>Cash received is less than the total.
                                 </p>
                             </div>
                         </div>
@@ -298,12 +298,12 @@
                         <button type="submit" id="cashSubmitBtn"
                             class="w-full py-3.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
                             disabled>
-                            Bayar
+                            Pay
                         </button>
                     </form>
                 </div>
 
-                <!-- Non-Tunai -->
+                <!-- Cashless -->
                 <div id="cashlessTab" class="paymentTabContent h-full hidden">
                     <form method="post" action="{{ route('checkout') }}" class="flex flex-col h-full">
                         @csrf
@@ -325,16 +325,16 @@
                         <div id="edcFields" class="cashlessFields space-y-4">
                             <div class="rounded-lg border border-gray-200 p-4">
                                 <p class="text-sm text-gray-600">
-                                    Customer gesek/tap kartu di mesin EDC. Input nomor referensi dari struk untuk audit (opsional).
+                                    Customer swipes/taps card on EDC machine. Enter reference number from receipt for audit (optional).
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                                    No. Referensi EDC <span class="text-gray-400 normal-case font-normal">(opsional)</span>
+                                    EDC Reference Number <span class="text-gray-400 normal-case font-normal">(optional)</span>
                                 </label>
                                 <input type="text" name="payment_reference" maxlength="255"
                                     class="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition"
-                                    placeholder="Contoh: 123456789">
+                                    placeholder="Example: 123456789">
                             </div>
                         </div>
 
@@ -342,7 +342,7 @@
                         <div id="qrisFields" class="cashlessFields hidden">
                             <div class="rounded-lg border border-gray-200 p-5">
                                 <p class="text-sm text-gray-600">
-                                    QRIS dari Midtrans akan tampil setelah klik <strong>Bayar</strong>. Customer scan kode dari tablet POS dengan e-wallet / m-banking.
+                                    QRIS from Midtrans will appear after clicking <strong>Pay</strong>. Customer scans the code from the POS tablet with an e-wallet / m-banking app.
                                 </p>
                                 <div class="mt-3 flex flex-wrap gap-1.5 text-xs text-gray-500">
                                     <span class="px-2 py-0.5 border border-gray-200 rounded">GoPay</span>
@@ -358,7 +358,7 @@
 
                         <button type="submit"
                             class="w-full py-3.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition">
-                            Bayar
+                            Pay
                         </button>
                     </form>
                 </div>
@@ -371,20 +371,20 @@
 
                         <div class="rounded-lg border border-gray-200 p-4 mb-5">
                             <p class="text-sm text-gray-600">
-                                Bill ditag ke meja terpilih. Customer boleh terus pesan, kasir tagih saat pulang. Stok dipotong saat tagih.
+                                Bill is tagged to the selected table. Customer can keep ordering, cashier settles when leaving. Stock is deducted at settlement.
                             </p>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Meja</label>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Table</label>
                             @if ($availableChairs->isEmpty())
                                 <div class="rounded-lg border border-gray-200 p-4 text-sm text-gray-500">
-                                    Tidak ada meja yang tersedia. Semua meja sedang ada bill terbuka, atau belum ada chair terdaftar.
+                                    No tables available. All tables have open bills, or no chair is registered yet.
                                 </div>
                             @else
                                 <select name="chair_id" required
                                     class="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition">
-                                    <option value="">-- pilih meja --</option>
+                                    <option value="">-- select table --</option>
                                     @foreach ($availableChairs as $chair)
                                         <option value="{{ $chair->id }}">{{ $chair->name }}</option>
                                     @endforeach
@@ -397,7 +397,7 @@
                         <button type="submit"
                             class="w-full py-3.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
                             {{ $availableChairs->isEmpty() ? 'disabled' : '' }}>
-                            Buka Bill
+                            Open Bill
                         </button>
                     </form>
                 </div>

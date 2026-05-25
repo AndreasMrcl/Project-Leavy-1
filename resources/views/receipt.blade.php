@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Struk {{ $order->no_order }}</title>
+    <title>Receipt {{ $order->no_order }}</title>
     @include('layout.head')
     <style>
         @media print {
@@ -36,12 +36,12 @@
 
     <div class="no-print max-w-md mx-auto mb-4 flex justify-between gap-2">
         <a href="{{ route('order') }}"
-            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i> Kembali
+            class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
+            <i class="fas fa-arrow-left"></i> Back
         </a>
         <button onclick="window.print()"
-            class="px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition flex items-center gap-2">
-            <i class="fas fa-print"></i> Cetak Struk
+            class="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
+            <i class="fas fa-print"></i> Print Receipt
         </button>
     </div>
 
@@ -50,7 +50,7 @@
             <h1 class="font-bold text-base">{{ $order->store->store ?? $order->store->name }}</h1>
             <p class="text-xs">{{ $order->store->location ?? '' }}</p>
             @if ($order->store->no_telpon ?? null)
-                <p class="text-xs">Telp: {{ $order->store->no_telpon }}</p>
+                <p class="text-xs">Phone: {{ $order->store->no_telpon }}</p>
             @endif
         </div>
 
@@ -58,19 +58,19 @@
 
         <div class="space-y-0.5 text-xs">
             <div class="flex justify-between">
-                <span>No. Order:</span>
+                <span>Order No:</span>
                 <span class="font-bold">{{ $order->no_order }}</span>
             </div>
             <div class="flex justify-between">
-                <span>Tanggal:</span>
+                <span>Date:</span>
                 <span>{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i') }}</span>
             </div>
             <div class="flex justify-between">
-                <span>Layanan:</span>
+                <span>Service:</span>
                 <span>{{ $order->layanan ?? 'dine-in' }}</span>
             </div>
             <div class="flex justify-between">
-                <span>Pembayaran:</span>
+                <span>Payment:</span>
                 <span class="uppercase font-bold">{{ $order->payment_type }}</span>
             </div>
             @if ($order->payment_reference)
@@ -91,7 +91,7 @@
                         <div class="text-xs italic">{{ str_replace('_', ' ', $cm->variety) }}</div>
                     @endif
                     @if ($cm->discount)
-                        <div class="text-xs">Diskon: {{ $cm->discount->name }} ({{ $cm->discount->percentage }}%)</div>
+                        <div class="text-xs">Discount: {{ $cm->discount->name }} ({{ $cm->discount->percentage }}%)</div>
                     @endif
                     @if ($cm->notes)
                         <div class="text-xs italic">Note: {{ $cm->notes }}</div>
@@ -116,7 +116,7 @@
         <div class="dashed pt-2 mt-3 mb-3"></div>
 
         <div class="text-center text-xs space-y-1">
-            <p>Terima kasih atas kunjungan Anda</p>
+            <p>Thank you for your visit</p>
             <p class="text-[10px] text-gray-500">{{ \Carbon\Carbon::parse($order->created_at)->format('d M Y H:i:s') }}</p>
         </div>
     </div>

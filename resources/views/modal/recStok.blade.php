@@ -6,14 +6,14 @@
                 <i class="fas fa-times text-xl"></i>
             </button>
             <h2 class="text-2xl font-bold mb-2 text-gray-800 flex items-center gap-2">
-                <i class="fas fa-truck-loading text-green-500"></i> Terima Bahan
+                <i class="fas fa-truck-loading text-green-500"></i> Receive Ingredient
             </h2>
             <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded mb-4">
                 <p class="text-sm text-green-800">
-                    Bahan: <strong id="receiveBahanName"></strong>
+                    Ingredient: <strong id="receiveBahanName"></strong>
                 </p>
                 <p class="text-xs text-green-700 mt-1">
-                    Stok saat ini: <span id="receiveBahanStock"></span>
+                    Current stock: <span id="receiveBahanStock"></span>
                     <span id="receiveBahanUnit"></span>
                 </p>
             </div>
@@ -23,15 +23,15 @@
                 <input type="hidden" name="invent_id" id="receiveInventId">
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jumlah Diterima</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Quantity Received</label>
                     <input type="number" name="quantity" min="1"
                         class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-green-500"
                         required>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Catatan
-                        <span class="text-gray-400 text-xs">(opsional, mis: nama supplier)</span>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Notes
+                        <span class="text-gray-400 text-xs">(optional, e.g.: supplier name)</span>
                     </label>
                     <input type="text" name="notes" maxlength="255"
                         class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-green-500">
@@ -39,7 +39,7 @@
 
                 <button type="submit"
                     class="w-full py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition flex justify-center items-center gap-2">
-                    <i class="fas fa-check"></i> Catat Penerimaan
+                    <i class="fas fa-check"></i> Record Receipt
                 </button>
             </form>
         </div>

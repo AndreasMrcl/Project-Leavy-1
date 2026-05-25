@@ -10,8 +10,8 @@
         <h2 id="editModalTitle" class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
             <i class="fas fa-edit text-blue-600"></i> Edit Master
         </h2>
-        <p class="text-xs text-gray-500 mb-4">Untuk koreksi jumlah stok, gunakan menu <strong>Stok Bahan</strong>
-            &rarr; Stock Opname.</p>
+        <p class="text-xs text-gray-500 mb-4">To correct stock amounts, use the <strong>Stock Ingridient</strong>
+            menu &rarr; Stock Opname.</p>
 
         <form id="editForm" method="post" enctype="multipart/form-data" class="space-y-5" novalidate>
             @csrf
@@ -19,7 +19,7 @@
 
             <div>
                 <label for="editName" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Nama Bahan <span class="text-red-500">*</span>
+                    Ingredient Name <span class="text-red-500">*</span>
                 </label>
                 <input type="text" id="editName" name="name"
                     class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
@@ -34,7 +34,7 @@
                 <select id="editUnit" name="unit"
                     class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     required aria-required="true">
-                    <option value="" disabled>Pilih Unit</option>
+                    <option value="" disabled>Select Unit</option>
                     <option value="pcs">Pcs</option>
                     <option value="kg">Kg</option>
                     <option value="g">Gram</option>
@@ -47,7 +47,7 @@
 
             <div>
                 <label for="editMinStock" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Min Stock <span class="text-gray-400 text-xs">(opsional)</span>
+                    Min Stock <span class="text-gray-400 text-xs">(optional)</span>
                 </label>
                 <input type="number" id="editMinStock" name="min_stock" min="0"
                     class="form-input w-full rounded-lg border-gray-300 shadow-sm p-2.5 border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">

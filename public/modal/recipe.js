@@ -25,7 +25,7 @@ $(document).ready(function () {
         });
     });
 
-    // ========== Pilih menu ==========
+    // ========== Select menu ==========
     $('.menuCard').click(function () {
         const card = $(this);
         const newId = card.data('id');
@@ -33,14 +33,14 @@ $(document).ready(function () {
 
         if (isDirty()) {
             Swal.fire({
-                title: 'Pindah produk?',
-                text: 'Perubahan resep yang belum disimpan akan hilang.',
+                title: 'Switch product?',
+                text: 'Unsaved recipe changes will be lost.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, pindah',
-                cancelButtonText: 'Batal',
+                confirmButtonText: 'Yes, switch',
+                cancelButtonText: 'Cancel',
             }).then((result) => {
                 if (result.isConfirmed) selectMenu(newId);
             });
@@ -71,7 +71,7 @@ $(document).ready(function () {
         $('#emptyState').addClass('hidden');
         $('#compositionArea').removeClass('hidden');
 
-        $('#submitLabel').text(data.has_recipe ? 'Update Resep' : 'Simpan Resep');
+        $('#submitLabel').text(data.has_recipe ? 'Update Recipe' : 'Save Recipe');
         $('#deleteBtn').toggleClass('hidden', !data.has_recipe).toggleClass('flex', data.has_recipe);
 
         renderVarietyTabs();
@@ -127,7 +127,7 @@ $(document).ready(function () {
             $panels.append(`
                 <div class="text-center py-6 text-gray-400 text-sm border border-dashed border-gray-200 rounded-lg">
                     <i class="fas fa-list-ul text-2xl block mb-2"></i>
-                    Belum ada bahan${selectedMenu.varieties.length > 1 ? ' di variety ini' : ''}.
+                    No ingredients yet${selectedMenu.varieties.length > 1 ? ' in this variety' : ''}.
                 </div>
             `);
             return;
@@ -143,7 +143,7 @@ $(document).ready(function () {
                         <p class="font-semibold text-gray-800 text-sm truncate">${item.name}</p>
                         <p class="text-xs text-gray-500">${fmtQty(item.qty)} ${item.unit}</p>
                     </div>
-                    <button type="button" class="removeItem w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-lg transition" data-idx="${idx}" title="Hapus">
+                    <button type="button" class="removeItem w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-lg transition" data-idx="${idx}" title="Remove">
                         <i class="fas fa-trash text-xs"></i>
                     </button>
                 </div>
@@ -167,7 +167,7 @@ $(document).ready(function () {
     $('#openModalBtn').click(function () {
         if (!selectedMenu) return;
         const hint = selectedMenu.varieties.length > 1
-            ? `Untuk variety: <strong>${labelize(activeVariety)}</strong>`
+            ? `For variety: <strong>${labelize(activeVariety)}</strong>`
             : '';
         $('#modalVarietyHint').html(hint);
         $('#modalBahanSelect').val('');
@@ -193,18 +193,18 @@ $(document).ready(function () {
         const qty = parseFloat($('#modalQty').val());
 
         if (!inventId) {
-            return Swal.fire({ icon: 'warning', title: 'Pilih bahan dulu', confirmButtonColor: '#ef4444' });
+            return Swal.fire({ icon: 'warning', title: 'Select an ingredient first', confirmButtonColor: '#ef4444' });
         }
         if (!qty || qty <= 0) {
-            return Swal.fire({ icon: 'warning', title: 'Jumlah tidak valid', text: 'Isi jumlah lebih dari 0.', confirmButtonColor: '#ef4444' });
+            return Swal.fire({ icon: 'warning', title: 'Invalid quantity', text: 'Enter a quantity greater than 0.', confirmButtonColor: '#ef4444' });
         }
 
         const dup = recipe[activeVariety].some(it => it.invent_id == inventId);
         if (dup) {
             return Swal.fire({
                 icon: 'warning',
-                title: 'Bahan sudah ada',
-                text: 'Bahan ini sudah ditambahkan di variety ini. Hapus dulu jika ingin diganti.',
+                title: 'Ingredient already added',
+                text: 'This ingredient is already in this variety. Remove it first if you want to replace it.',
                 confirmButtonColor: '#ef4444',
             });
         }
@@ -225,14 +225,14 @@ $(document).ready(function () {
     $('#deleteBtn').click(function () {
         if (!selectedMenu) return;
         Swal.fire({
-            title: 'Hapus resep ini?',
-            text: `Komposisi bahan untuk "${selectedMenu.name}" akan dihapus.`,
+            title: 'Delete this recipe?',
+            text: `The ingredient composition for "${selectedMenu.name}" will be deleted.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Ya, Hapus',
-            cancelButtonText: 'Batal',
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) $('#deleteForm').submit();
         });
@@ -246,7 +246,7 @@ $(document).ready(function () {
         const total = Object.values(recipe).reduce((sum, arr) => sum + arr.length, 0);
         if (total === 0) {
             e.preventDefault();
-            Swal.fire({ icon: 'warning', title: 'Belum ada bahan', text: 'Tambahkan minimal 1 bahan.', confirmButtonColor: '#ef4444' });
+            Swal.fire({ icon: 'warning', title: 'No ingredients yet', text: 'Add at least 1 ingredient.', confirmButtonColor: '#ef4444' });
             return;
         }
 

@@ -38,14 +38,14 @@ $(document).ready(function () {
         e.preventDefault();
         const form = $(this).closest('form');
         Swal.fire({
-            title: 'Hapus?',
-            text: 'Data akan dihapus permanen.',
+            title: 'Delete?',
+            text: 'Data will be permanently deleted.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Ya, Hapus',
-            cancelButtonText: 'Batal'
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel'
         }).then(result => result.isConfirmed && form.submit());
     });
 
@@ -105,7 +105,7 @@ $(document).ready(function () {
         const $chip = $(`
             <span class="varietyChip inline-flex items-center gap-1 bg-red-50 text-red-700 text-sm font-semibold px-2.5 py-1 rounded-full" data-slug="${slug}">
                 ${labelize(slug)}
-                <button type="button" class="varietyChipRemove text-red-500 hover:text-red-700" aria-label="Hapus">
+                <button type="button" class="varietyChipRemove text-red-500 hover:text-red-700" aria-label="Remove">
                     <i class="fas fa-times text-xs"></i>
                 </button>
             </span>
@@ -168,7 +168,7 @@ $(document).ready(function () {
 
         const slugs = getChipSlugs(prefix);
         if (slugs.length < 2) {
-            showError(`${prefix}VarietyError`, 'Minimal 2 variety. Tambahkan dulu sebelum submit.');
+            showError(`${prefix}VarietyError`, 'Minimum 2 varieties. Add them before submitting.');
             return false;
         }
         hideError(`${prefix}VarietyError`);

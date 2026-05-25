@@ -96,7 +96,7 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pajak / PPN</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tax / VAT</label>
                                     <div class="relative">
                                         <input type="number" step="0.01" name="tax_percent"
                                             value="{{ $config->tax_percent }}"
@@ -178,7 +178,7 @@
                         <div class="pt-4 flex justify-end border-t border-gray-100">
                             <button type="submit"
                                 class="px-8 py-3 bg-slate-800 text-white font-bold rounded-lg shadow-lg hover:bg-slate-900 transition transform hover:-translate-y-0.5 flex items-center gap-2">
-                                <i class="fas fa-save"></i> Simpan Konfigurasi
+                                <i class="fas fa-save"></i> Save Configuration
                             </button>
                         </div>
                     </form>

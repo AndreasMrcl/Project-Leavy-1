@@ -36,9 +36,9 @@
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
-                        Result for "{{ request('search') }}"
+                        <i class="fas fa-magnifying-glass text-slate-600"></i> Result for "{{ request('search') }}"
                     </h1>
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 mt-1">
                         Results based on your search keywords across the entire system
                     </p>
                 </div>
@@ -54,7 +54,7 @@
                     <p class="text-sm text-gray-500">Manage products</p>
                 </div>
                 <a href="{{ route('product') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>
@@ -102,7 +102,7 @@
                     <p class="text-sm text-gray-500">Manage product categories</p>
                 </div>
                 <a href="{{ route('category') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>
@@ -129,7 +129,7 @@
                 </div>
             </div>
 
-            <!-- INVENT (Bahan) -->
+            <!-- INVENT (Ingredients) -->
             <div
                 class="md:flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-2 md:space-y-0">
                 <div>
@@ -139,7 +139,7 @@
                     <p class="text-sm text-gray-500">Stock of ingredients</p>
                 </div>
                 <a href="{{ route('invent') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>
@@ -194,7 +194,7 @@
                     <p class="text-sm text-gray-500">Order that has not been archived</p>
                 </div>
                 <a href="{{ route('order') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>
@@ -248,7 +248,7 @@
                     <p class="text-sm text-gray-500">Orders that have been completed / archived</p>
                 </div>
                 <a href="{{ route('history') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>
@@ -295,7 +295,7 @@
                     <p class="text-sm text-gray-500">Manage discount and promo</p>
                 </div>
                 <a href="{{ route('discount') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>
@@ -336,7 +336,7 @@
                     <p class="text-sm text-gray-500">Showcase / product package</p>
                 </div>
                 <a href="{{ route('showcase') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>
@@ -373,7 +373,7 @@
                     <p class="text-sm text-gray-500">List of chairs / customers with QR codes</p>
                 </div>
                 <a href="{{ route('chair') }}"
-                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-green-600 transition font-semibold flex items-center gap-2">
+                    class="px-6 py-3 bg-slate-700 text-white rounded-lg shadow-md hover:bg-slate-800 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fa fa-external-link"></i> Go to Page
                 </a>
             </div>

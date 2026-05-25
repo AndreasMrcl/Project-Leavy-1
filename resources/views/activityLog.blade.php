@@ -41,10 +41,26 @@
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
                         <i class="fas fa-history text-indigo-600"></i> Log Activity
                     </h1>
-                    <p class="text-sm text-gray-500 mt-1">Monitor User & System Activities</p>
+                    <p class="text-sm text-gray-500 mt-1">View user and system activity logs</p>
                 </div>
             </div>
 
+            @if ($logs->isEmpty())
+                <!-- Empty State -->
+                <div class="w-full bg-white rounded-xl shadow-md border border-gray-100">
+                    <div class="p-12 text-center">
+                        <div class="flex flex-col items-center justify-center opacity-70">
+                            <div
+                                class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-4 border border-indigo-100">
+                                <i class="fas fa-history text-4xl text-indigo-300"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">No Activity Logs Found</h3>
+                            <p class="text-sm text-gray-500 mt-1">System activities will be recorded here
+                                automatically.</p>
+                        </div>
+                    </div>
+                </div>
+            @else
             <!-- Table Section -->
             <div class="w-full bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                 <div class="p-5 overflow-auto">
@@ -57,7 +73,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-gray-700 text-sm divide-y divide-gray-200">
-                            @forelse ($logs as $log)
+                            @foreach ($logs as $log)
                                 <tr class="hover:bg-gray-50 transition duration-150 align-top">
 
                                     <!-- 1. Waktu & Aktor -->
@@ -143,26 +159,13 @@
                                     </td>
 
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="p-12 text-center">
-                                        <div class="flex flex-col items-center justify-center opacity-50">
-                                            <div
-                                                class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                <i class="fas fa-history text-4xl text-gray-300"></i>
-                                            </div>
-                                            <h3 class="text-lg font-medium text-gray-900">No Activity Logs Found</h3>
-                                            <p class="text-sm text-gray-500 mt-1">System activities will be recorded
-                                                here automatically.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
 
                 </div>
             </div>
+            @endif
         </div>
     </main>
 

@@ -50,22 +50,31 @@
                     <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
                         <i class="fas fa-tags text-red-500"></i> Recipe
                     </h1>
-                    <p class="text-sm text-gray-500">Select a product then manage its ingredients.</p>
+                    <p class="text-sm text-gray-500 mt-1">Select a product and manage its recipe ingredients</p>
                 </div>
                 <a href="{{ route('product') }}"
-                    class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300 transition font-semibold flex items-center gap-2 justify-center">
+                    class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
             </div>
 
             @if ($menus->isEmpty())
-                <div class="bg-white rounded-xl shadow-md border border-gray-100 p-12 text-center">
-                    <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                    <h3 class="text-lg font-semibold text-gray-600 mb-2">No Products Available</h3>
-                    <p class="text-gray-500 mb-6">Please add a <strong>Product</strong> before creating a recipe.</p>
-                    <a href="{{ route('product') }}" class="inline-flex items-center gap-2 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold">
-                        <i class="fas fa-plus"></i> Go to Product Page
-                    </a>
+                <div class="w-full bg-white rounded-xl shadow-md border border-gray-100">
+                    <div class="p-12 text-center">
+                        <div class="flex flex-col items-center justify-center opacity-70">
+                            <div
+                                class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-4 border border-red-100">
+                                <i class="fas fa-inbox text-4xl text-red-300"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">No Products Available</h3>
+                            <p class="text-sm text-gray-500 mt-1 mb-6">Please add a <strong>Product</strong> before
+                                creating a recipe.</p>
+                            <a href="{{ route('product') }}"
+                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 hover:scale-105 transition font-bold text-sm">
+                                <i class="fas fa-plus"></i> Go to Product Page
+                            </a>
+                        </div>
+                    </div>
                 </div>
             @else
                 <form id="ingredientForm" method="post" action="">
@@ -74,11 +83,11 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-                        <!-- LEFT: Pilih Produk -->
+                        <!-- LEFT: Select Product -->
                         <div class="lg:col-span-3 bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
                             <div class="flex items-center gap-2">
                                 <h3 class="font-semibold text-gray-700">Select Product</h3>
-                                <input type="text" id="menuSearch" placeholder="Cari produk..."
+                                <input type="text" id="menuSearch" placeholder="Search product..."
                                     class="flex-1 rounded-lg border-gray-300 shadow-sm p-2 border text-sm focus:ring-2 focus:ring-red-500">
                             </div>
 
@@ -126,7 +135,7 @@
                             </div>
                         </div>
 
-                        <!-- RIGHT: Komposisi -->
+                        <!-- RIGHT: Composition -->
                         <div class="lg:col-span-2 bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
 
                             <!-- Empty state -->
@@ -147,7 +156,7 @@
                                     <div id="varietyTabsList" class="flex gap-2 -mb-px overflow-x-auto"></div>
                                 </div>
 
-                                <!-- Bahan list -->
+                                <!-- Ingredient list -->
                                 <div id="varietyPanels" class="space-y-3"></div>
 
                                 <button type="button" id="openModalBtn"

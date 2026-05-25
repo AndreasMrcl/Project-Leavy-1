@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Pembayaran Online — {{ $order->no_order }}</title>
+    <title>Online Payment — {{ $order->no_order }}</title>
     @include('layout.head')
     <script type="text/javascript" src="https://app.midtrans.com/snap/snap.js"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
@@ -15,19 +15,19 @@
         @include('layout.navbar')
         <div class="p-6">
             <div class="max-w-md mx-auto bg-white rounded-xl shadow-md border border-gray-100 p-8 text-center space-y-4">
-                <div class="bg-purple-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center">
+                <div class="bg-purple-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center border border-purple-200">
                     <i class="fas fa-qrcode text-purple-600 text-3xl"></i>
                 </div>
-                <h1 class="text-xl font-bold text-gray-800">Pembayaran QRIS</h1>
+                <h1 class="text-xl font-bold text-gray-800">QRIS Payment</h1>
                 <p class="text-sm text-gray-500">
-                    Order: <span class="font-mono">{{ $order->no_order }}</span><br>
-                    Total: <strong>Rp{{ number_format($order->cart->total_amount, 0, ',', '.') }}</strong>
+                    Order: <span class="font-mono font-bold text-gray-700">{{ $order->no_order }}</span><br>
+                    Total: <strong class="font-mono text-gray-800">Rp{{ number_format($order->cart->total_amount, 0, ',', '.') }}</strong>
                 </p>
-                <p id="snapStatus" class="text-sm text-gray-600">Membuka Midtrans Snap UI...</p>
+                <p id="snapStatus" class="text-sm text-gray-600">Opening Midtrans Snap UI...</p>
 
                 <a href="{{ route('order') }}"
-                    class="block w-full py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition text-center">
-                    Kembali ke Order
+                    class="block w-full py-3 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition text-center text-sm">
+                    Back to Orders
                 </a>
             </div>
         </div>
@@ -53,18 +53,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             window.snap.pay('{{ $snapToken }}', {
                 onSuccess: function (result) {
-                    document.getElementById('snapStatus').textContent = 'Pembayaran berhasil. Mengkonfirmasi...';
+                    document.getElementById('snapStatus').textContent = 'Payment successful. Confirming...';
                     confirmPayment();
                 },
                 onPending: function (result) {
-                    document.getElementById('snapStatus').textContent = 'Pembayaran pending. Memeriksa status...';
+                    document.getElementById('snapStatus').textContent = 'Payment pending. Checking status...';
                     confirmPayment();
                 },
                 onError: function (result) {
-                    backToOrder('Pembayaran gagal. Silakan coba lagi melalui tombol Lanjutkan Pembayaran di tabel order.');
+                    backToOrder('Payment failed. Please try again via the Continue Payment button on the orders table.');
                 },
                 onClose: function () {
-                    backToOrder('Pembayaran ditutup. Klik tombol Lanjutkan Pembayaran di tabel order untuk melanjutkan.');
+                    backToOrder('Payment closed. Click the Continue Payment button on the orders table to resume.');
                 },
             });
         });
