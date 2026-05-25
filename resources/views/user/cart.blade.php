@@ -2,131 +2,144 @@
 <html lang="en">
 
 <head>
-    <title>Cart</title>
+    <title>Keranjang</title>
     @include('user.layout.head')
 </head>
 
 <body class="font-poppins bg-gray-50">
-    <div class='w-full sm:max-w-sm mx-auto h-screen '>
-        <div class='sm:max-w-sm'>
-            {{-- NAVBAR --}}
-            <div class="fixed top-0 left-0 right-0 z-50 w-full sm:max-w-sm mx-auto">
-                <div class="p-4 bg-white shadow-xl space-y-4 rounded-b-[20px]">
-                    <div class="flex items-center">
-                        <a href="{{ route('user-product') }}" class="p-2 -ml-2 text-gray-700 hover:text-black">
-                            <span class="material-icons">arrow_back</span>
-                        </a>
-                        <div class="mx-auto">
-                            <h1 class="text-center text-xl font-extralight">Keranjang</h1>
-                        </div>
-                        <a href="{{ route('user-home') }}" class="p-2 -mr-2 text-gray-700 hover:text-black">
-                            <span class="material-icons">home</span>
-                        </a>
+    <div class='w-full sm:max-w-sm mx-auto min-h-screen'>
+
+        {{-- NAVBAR --}}
+        <div class="fixed top-0 left-0 right-0 z-50 w-full sm:max-w-sm mx-auto">
+            <div class="bg-white shadow-lg rounded-b-[22px]">
+                <div class="px-4 pt-4 pb-3 flex items-center gap-2">
+                    <a href="{{ route('user-product') }}" class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-700">
+                        <span class="material-icons text-lg">arrow_back</span>
+                    </a>
+                    <div class="flex-1 text-center">
+                        <h1 class="text-base font-semibold text-gray-900">Keranjang</h1>
+                        <p class="text-[10px] text-gray-400">Meja {{ auth()->user()->name ?? '-' }}</p>
                     </div>
-                    <hr>
-                    <div class="flex justify-between mx-10">
-                        <a href="{{ route('user-product') }}">
-                            <div class="flex space-x-1">
-                                <div class="bg-black p-1 rounded-md">
-                                    <h1 class="text-xs font-light text-white px-1">1</h1>
-                                </div>
-                                <div class="my-auto">
-                                    <h1 class="text-sm font-light">Product</h1>
-                                </div>
+                    <a href="{{ route('user-home') }}" class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-700">
+                        <span class="material-icons text-lg">home</span>
+                    </a>
+                </div>
+
+                {{-- Step indicator --}}
+                <div class="px-5 pb-3 flex items-center gap-2">
+                    @php
+                        $steps = [
+                            ['n' => 1, 'label' => 'Menu',  'active' => false, 'done' => true],
+                            ['n' => 2, 'label' => 'Cart',  'active' => true,  'done' => false],
+                            ['n' => 3, 'label' => 'Bayar', 'active' => false, 'done' => false],
+                        ];
+                    @endphp
+                    @foreach ($steps as $i => $s)
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold
+                                {{ $s['active'] || $s['done'] ? 'bg-red-800 text-white' : 'bg-gray-200 text-gray-400' }}">
+                                @if ($s['done'])
+                                    <span class="material-icons text-sm">check</span>
+                                @else
+                                    {{ $s['n'] }}
+                                @endif
                             </div>
-                        </a>
-                        <a href="{{ route('user-cart') }}">
-                            <div class="flex space-x-1">
-                                <div class="bg-black p-1 rounded-md">
-                                    <h1 class="text-xs font-light text-white px-1">2</h1>
-                                </div>
-                                <div class="my-auto">
-                                    <h1 class="text-sm font-bold">Cart</h1>
-                                </div>
-                            </div>
-                        </a>
-                        <div class="flex space-x-1">
-                            <div class="bg-black p-1 rounded-md">
-                                <h1 class="text-xs font-light text-white px-1">3</h1>
-                            </div>
-                            <div class="my-auto">
-                                <h1 class="text-sm font-light">Payment</h1>
-                            </div>
+                            <span class="text-xs {{ $s['active'] ? 'font-bold text-gray-900' : 'font-semibold text-gray-400' }}">{{ $s['label'] }}</span>
                         </div>
-                    </div>
+                        @if ($i < count($steps) - 1)
+                            <div class="flex-1 h-0.5 rounded-full {{ $s['done'] ? 'bg-red-800' : 'bg-gray-200' }}"></div>
+                        @endif
+                    @endforeach
                 </div>
             </div>
-            <div class="h-32"></div>
+        </div>
 
-            {{-- BODY --}}
-            <div class="p-4 space-y-4">
-                @forelse ($cart->cartMenus as $item)
-                    <div class="bg-white rounded-xl shadow-sm p-3 flex gap-3 items-center">
-                        <div class="w-16 h-16 shrink-0">
-                            <img src="{{ asset('storage/img/' . basename($item->menu->img)) }}" alt="Product Image"
-                                class='w-full h-full object-cover rounded-md' />
-                        </div>
-                        <div class="flex-1 space-y-1 min-w-0">
-                            <h1 class="font-bold text-sm truncate">{{ $item->menu->name }}</h1>
+        <div class="h-[120px]"></div>
+
+        {{-- BODY --}}
+        <div class="px-3 pb-40 space-y-2.5">
+            @forelse ($cart->cartMenus as $item)
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3 flex gap-3 items-center">
+                    <div class="w-16 h-16 shrink-0 rounded-xl bg-gray-50 overflow-hidden">
+                        <img src="{{ asset('storage/img/' . basename($item->menu->img)) }}" alt="{{ $item->menu->name }}"
+                            class='w-full h-full object-cover' />
+                    </div>
+                    <div class="flex-1 min-w-0 space-y-0.5">
+                        <h3 class="font-bold text-sm text-gray-900 truncate">{{ $item->menu->name }}</h3>
+                        <div class="flex flex-wrap gap-1.5">
                             @if ($item->variety && $item->variety !== 'normal')
-                                <p class="text-xs text-purple-600 font-medium">{{ ucwords(str_replace('_', ' ', $item->variety)) }}</p>
+                                <span class="text-[10px] text-red-800 font-semibold">{{ ucwords(str_replace('_', ' ', $item->variety)) }}</span>
                             @endif
                             @if ($item->notes)
-                                <p class="text-xs text-gray-500 truncate">- {{ $item->notes }}</p>
+                                <span class="text-[10px] text-gray-400 italic truncate">"{{ $item->notes }}"</span>
                             @endif
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-600">{{ $item->quantity }} x</span>
-                                <span class="font-semibold text-sm">Rp.{{ number_format($item->subtotal, 0, ',', '.') }}</span>
-                            </div>
                         </div>
-                        <form method="post" action="{{ route('user-removecart', ['id' => $item->id]) }}">
-                            @csrf
-                            @method('delete')
-                            <button type="submit" class="p-2 bg-red-800 rounded-md text-white w-10 h-10 flex items-center justify-center hover:bg-red-900">
-                                <span class="material-icons text-base">delete</span>
-                            </button>
-                        </form>
+                        <div class="flex justify-between items-center pt-0.5">
+                            <span class="text-xs text-gray-500"><span class="font-bold text-gray-900">{{ $item->quantity }}×</span></span>
+                            <span class="font-bold text-sm text-gray-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                        </div>
                     </div>
-                @empty
-                    <div class="text-center py-12 space-y-3">
-                        <span class="material-icons text-6xl text-gray-300">shopping_cart</span>
-                        <p class="text-gray-500">Keranjang kosong</p>
-                        <a href="{{ route('user-product') }}" class="inline-block px-6 py-2 bg-red-800 text-white rounded-full text-sm">
-                            Pilih Menu
-                        </a>
+                    <form method="post" action="{{ route('user-removecart', ['id' => $item->id]) }}">
+                        @csrf
+                        @method('delete')
+                        <button type="submit" class="w-9 h-9 rounded-xl bg-red-50 text-red-800 flex items-center justify-center hover:bg-red-100">
+                            <span class="material-icons text-base">delete_outline</span>
+                        </button>
+                    </form>
+                </div>
+            @empty
+                <div class="text-center py-16 space-y-3">
+                    <div class="w-16 h-16 mx-auto rounded-2xl bg-gray-100 flex items-center justify-center">
+                        <span class="material-icons text-3xl text-gray-300">shopping_cart</span>
                     </div>
-                @endforelse
-            </div>
+                    <p class="font-semibold text-gray-600">Keranjang masih kosong</p>
+                    <p class="text-xs text-gray-400">Pilih menu untuk mulai memesan</p>
+                    <a href="{{ route('user-product') }}" class="inline-block px-6 py-2.5 bg-red-800 text-white rounded-xl text-sm font-bold">
+                        Pilih Menu
+                    </a>
+                </div>
+            @endforelse
 
-            {{-- FOOTER --}}
-            <div class="h-20"></div>
-            <div class="flex flex-col items-center justify-center">
-                <div class="fixed bottom-4 right-0 left-0 max-w-xs bg-white p-1 rounded-md mx-auto">
-                    <div class="grid grid-cols-2">
-                        <div class="mx-auto">
-                            <h1 class="text-lg font-light">Total</h1>
-                            <h1 class="font-extrabold text-xl">Rp.{{ number_format($cart->total_amount, 0, ',', '.') }}
-                            </h1>
-                        </div>
-                        <div class="my-auto">
-                            @if ($cart->total_amount > 0)
-                                <a href="{{ route('user-payment') }}">
-                                    <h1
-                                        class="bg-black bg-opacity-90 font-bold text-white w-3/4 mx-auto text-base p-3 rounded-full text-center">
-                                        Payment >
-                                    </h1>
-                                </a>
-                            @else
-                                <div
-                                    class="bg-gray-400 font-bold text-white w-3/4 mx-auto text-base p-3 rounded-full text-center cursor-not-allowed">
-                                    Payment >
-                                </div>
-                            @endif
-                        </div>
+            {{-- Totals --}}
+            @if ($cart->cartMenus->count() > 0)
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-2 mt-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Subtotal</span>
+                        <span class="font-semibold text-gray-900">Rp {{ number_format($cart->total_amount, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Biaya layanan</span>
+                        <span class="text-gray-400">Rp 0</span>
+                    </div>
+                    <div class="border-t border-gray-100 pt-2 flex justify-between items-baseline">
+                        <span class="text-sm font-bold text-gray-900">Total</span>
+                        <span class="text-lg font-extrabold text-gray-900">Rp {{ number_format($cart->total_amount, 0, ',', '.') }}</span>
                     </div>
                 </div>
+            @endif
+        </div>
+
+        {{-- STICKY FOOTER --}}
+        <div class="fixed bottom-0 left-0 right-0 w-full sm:max-w-sm mx-auto z-50 bg-white border-t border-gray-100 shadow-[0_-8px_18px_rgba(0,0,0,0.04)]">
+            <div class="p-3 flex items-center gap-3">
+                <div class="flex-1 min-w-0">
+                    <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total</p>
+                    <p class="text-lg font-bold text-gray-900">Rp {{ number_format($cart->total_amount, 0, ',', '.') }}</p>
+                </div>
+                @if ($cart->total_amount > 0)
+                    <a href="{{ route('user-payment') }}" class="px-5 py-3 bg-red-800 text-white font-bold rounded-xl flex items-center gap-1.5">
+                        Ke Pembayaran
+                        <span class="material-icons text-base">arrow_forward</span>
+                    </a>
+                @else
+                    <div class="px-5 py-3 bg-gray-300 text-white font-bold rounded-xl flex items-center gap-1.5 cursor-not-allowed">
+                        Ke Pembayaran
+                        <span class="material-icons text-base">arrow_forward</span>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 </body>
+
 </html>

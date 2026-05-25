@@ -95,6 +95,27 @@ class PagesController extends Controller
                     'bg_color' => $status->transaction_status === 'settlement' ? 'text-white text-center bg-green-500 w-fit rounded-xl' : 'text-white text-center bg-red-500 w-fit rounded-xl'
                 ];
             } catch (\Exception $e) {
+                // Midtrans returns 404 "Transaction doesn't exist" when the user
+                // closed the Snap popup before picking a payment method. The order
+                // exists locally but Midtrans has no record of it — treat the same
+                // as 'expire' once a short grace period has passed (in case the
+                // user is still in checkout).
+                $isNotFound = str_contains($e->getMessage(), "Transaction doesn't exist")
+                    || str_contains($e->getMessage(), 'HTTP status code: 404');
+
+                if ($isNotFound && $order->created_at->lt(now()->subMinutes(10))) {
+                    $order->delete();
+                    continue;
+                }
+
+                if ($isNotFound) {
+                    $statuses[$order->no_order] = (object) [
+                        'status' => 'pending',
+                        'bg_color' => 'text-white text-center bg-amber-500 w-fit rounded-xl',
+                    ];
+                    continue;
+                }
+
                 $statuses[$order->no_order] = (object) [
                     'status' => 'Error: ' . $e->getMessage(),
                     'bg_color' => 'bg-red-500 w-fit text-white text-center rounded-xl'
