@@ -21,12 +21,13 @@ class OrderResource extends JsonResource
             'created_at'        => optional($this->created_at)->toIso8601String(),
             'updated_at'        => optional($this->updated_at)->toIso8601String(),
             'cart'              => $this->cart ? [
-                'id'    => $this->cart->id,
-                'chair' => $this->cart->chair ? [
+                'id'            => $this->cart->id,
+                'customer_name' => $this->cart->customer_name,
+                'chair'         => $this->cart->chair ? [
                     'id'   => $this->cart->chair->id,
                     'name' => $this->cart->chair->name,
                 ] : null,
-                'items' => CartItemResource::collection($this->cart->cartMenus),
+                'items'         => CartItemResource::collection($this->cart->cartMenus),
             ] : null,
         ];
     }

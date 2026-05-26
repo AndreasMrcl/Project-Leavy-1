@@ -20,7 +20,7 @@ class OpenBillController extends Controller
 
         $openBills = Cart::openBills()
             ->where('store_id', $storeId)
-            ->with(['chair', 'cartMenus.menu', 'cartMenus.discount'])
+            ->with(['cartMenus.menu', 'cartMenus.discount'])
             ->latest('opened_at')
             ->get();
 
@@ -33,19 +33,11 @@ class OpenBillController extends Controller
         $userStore = $user->store;
 
         $data = $request->validate([
-            'chair_id' => 'required|exists:chairs,id',
-            'cart_id'  => 'nullable|integer',
+            'customer_name' => 'required|string|max:255',
+            'cart_id'       => 'nullable|integer',
         ]);
 
-        $chair = $userStore->chairs()->where('id', $data['chair_id'])->first();
-        if (! $chair) {
-            return $this->error('chair', 'Chair tidak valid.', 422);
-        }
-
-        $existing = Cart::openBills()->where('chair_id', $chair->id)->exists();
-        if ($existing) {
-            return $this->error('chair', 'Chair '.$chair->name.' sudah memiliki open bill.', 409);
-        }
+        $customerName = trim($data['customer_name']);
 
         $cart = ! empty($data['cart_id'])
             ? Cart::where('id', $data['cart_id'])->where('store_id', $userStore->id)->first()
@@ -59,12 +51,12 @@ class OpenBillController extends Controller
             return $this->error('cart', 'Cart ini sudah punya order, tidak bisa dibuka sebagai bill.', 409);
         }
 
-        DB::transaction(function () use ($cart, $chair, $user, $userStore) {
+        DB::transaction(function () use ($cart, $customerName, $user, $userStore) {
             $cart->update([
-                'is_open_bill' => true,
-                'opened_at'    => now(),
-                'chair_id'     => $chair->id,
-                'expires_at'   => null,
+                'is_open_bill'  => true,
+                'opened_at'     => now(),
+                'customer_name' => $customerName,
+                'expires_at'    => null,
             ]);
 
             $user->carts()->create([
@@ -73,9 +65,9 @@ class OpenBillController extends Controller
             ]);
         });
 
-        ActivityLogger::log('Open Bill', "Opening bill for chair: {$chair->name}", $userStore->id);
+        ActivityLogger::log('Open Bill', "Opening bill for: {$customerName}", $userStore->id);
 
-        $cart->load('cartMenus.menu', 'cartMenus.discount', 'chair');
+        $cart->load('cartMenus.menu', 'cartMenus.discount');
 
         return $this->ok(['cart' => new CartResource($cart)]);
     }
@@ -93,7 +85,7 @@ class OpenBillController extends Controller
             return $this->error('open_bill', 'Open bill tidak ditemukan.', 404);
         }
 
-        $chairName = $cart->chair?->name ?? 'unknown';
+        $label = $cart->customer_name ?? $cart->chair?->name ?? 'unknown';
 
         DB::transaction(function () use ($cart) {
             $cart->cartMenus()->delete();
@@ -101,7 +93,7 @@ class OpenBillController extends Controller
             $cart->delete();
         });
 
-        ActivityLogger::log('Cancel Open Bill', "Canceling open bill for chair: {$chairName}", $userStore->id);
+        ActivityLogger::log('Cancel Open Bill', "Canceling open bill for: {$label}", $userStore->id);
 
         return $this->ok(['message' => 'Open bill canceled.']);
     }

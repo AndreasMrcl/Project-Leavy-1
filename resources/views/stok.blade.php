@@ -41,10 +41,16 @@
                     </h1>
                     <p class="text-sm text-gray-500 mt-1">Manage your ingredient stock levels</p>
                 </div>
-                <a href="{{ route('opname') }}"
-                    class="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
-                    <i class="fas fa-clipboard-check"></i> Stock Opname
-                </a>
+                <div class="flex gap-2">
+                    <a href="{{ route('opnameHistory') }}"
+                        class="px-6 py-3 bg-white border border-gray-300 text-gray-800 rounded-lg shadow-sm hover:bg-gray-50 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
+                        <i class="fas fa-history"></i> Opname History
+                    </a>
+                    <a href="{{ route('opname') }}"
+                        class="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
+                        <i class="fas fa-clipboard-check"></i> Stock Opname
+                    </a>
+                </div>
             </div>
 
             @php $lowStockCount = $invents->filter(fn($i) => $i->isLowStock())->count(); @endphp

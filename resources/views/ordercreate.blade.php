@@ -21,7 +21,7 @@
                         <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
                             <i class="fas fa-utensils text-amber-500"></i> Add to Bill
                         </h1>
-                        <p class="text-sm text-gray-500 mt-1">Mode: add items to <span class="font-bold text-amber-600">Table {{ $cart->chair->name ?? '-' }}</span>'s bill. Click <strong>Save to Bill</strong> when done.</p>
+                        <p class="text-sm text-gray-500 mt-1">Mode: add items to <span class="font-bold text-amber-600">{{ $cart->customer_name ?? $cart->chair->name ?? '-' }}</span>'s bill. Click <strong>Save to Bill</strong> when done.</p>
                     @else
                         <h1 class="font-bold text-2xl text-gray-800 flex items-center gap-2">
                             <i class="fas fa-cash-register text-blue-500"></i> Create New Order
@@ -39,7 +39,7 @@
                 <div class="bg-amber-50 border-l-4 border-amber-500 rounded-lg p-4 flex items-center gap-3 shadow-sm">
                     <i class="fas fa-info-circle text-amber-600 text-xl"></i>
                     <p class="text-sm text-amber-800 font-bold">
-                        Items added will go into Table {{ $cart->chair->name ?? '-' }}'s <strong>open bill</strong>.
+                        Items added will go into {{ $cart->customer_name ?? $cart->chair->name ?? '-' }}'s <strong>open bill</strong>.
                         Stock is not deducted until the bill is settled.
                     </p>
                 </div>
@@ -371,32 +371,21 @@
 
                         <div class="rounded-lg border border-gray-200 p-4 mb-5">
                             <p class="text-sm text-gray-600">
-                                Bill is tagged to the selected table. Customer can keep ordering, cashier settles when leaving. Stock is deducted at settlement.
+                                Bill is tagged to the customer's name. Customer can keep ordering across days. Stock is deducted at settlement.
                             </p>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Table</label>
-                            @if ($availableChairs->isEmpty())
-                                <div class="rounded-lg border border-gray-200 p-4 text-sm text-gray-500">
-                                    No tables available. All tables have open bills, or no chair is registered yet.
-                                </div>
-                            @else
-                                <select name="chair_id" required
-                                    class="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition">
-                                    <option value="">-- select table --</option>
-                                    @foreach ($availableChairs as $chair)
-                                        <option value="{{ $chair->id }}">{{ $chair->name }}</option>
-                                    @endforeach
-                                </select>
-                            @endif
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Customer Name</label>
+                            <input type="text" name="customer_name" required maxlength="255"
+                                class="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition"
+                                placeholder="e.g.: Andi / Table 5 / Walk-in #1">
                         </div>
 
                         <div class="flex-1"></div>
 
                         <button type="submit"
-                            class="w-full py-3.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-                            {{ $availableChairs->isEmpty() ? 'disabled' : '' }}>
+                            class="w-full py-3.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition">
                             Open Bill
                         </button>
                     </form>

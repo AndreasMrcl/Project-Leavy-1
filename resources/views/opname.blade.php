@@ -47,10 +47,16 @@
                     </h1>
                     <p class="text-sm text-gray-500 mt-1">Reconcile system stock with physical count</p>
                 </div>
-                <a href="{{ route('stock') }}"
-                    class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
+                <div class="flex gap-2">
+                    <a href="{{ route('opnameHistory') }}"
+                        class="px-6 py-3 bg-white border border-gray-300 text-gray-800 rounded-lg shadow-sm hover:bg-gray-50 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
+                        <i class="fas fa-history"></i> History
+                    </a>
+                    <a href="{{ route('stock') }}"
+                        class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300 hover:scale-105 transition font-bold flex items-center gap-2 text-sm">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
             </div>
 
             @if ($invents->isEmpty())

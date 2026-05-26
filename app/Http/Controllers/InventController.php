@@ -14,10 +14,7 @@ class InventController extends Controller
 {
     public function index()
     {
-        $storeId = Auth::user()->store->id;
-        $cacheKey = "invents_{$storeId}";
-
-        $invents = Cache::remember($cacheKey, 180, fn () => Invent::all());
+        $invents = Invent::all();
 
         return view('invent', compact('invents'));
     }
@@ -47,6 +44,7 @@ class InventController extends Controller
                     'invent_id' => $invent->id,
                     'user_id' => Auth::id(),
                     'quantity' => $initial,
+                    'stock_before' => 0,
                     'type' => 'receive',
                     'notes' => 'Initial stock',
                 ]);

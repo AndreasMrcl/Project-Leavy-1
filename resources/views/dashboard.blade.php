@@ -33,6 +33,8 @@
                 </div>
             </div>
 
+            @include('layout.openBillReminder')
+
             <!-- KPI Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 

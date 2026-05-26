@@ -47,6 +47,8 @@
                 </a>
             </div>
 
+            @include('layout.openBillReminder')
+
             <!-- Open Bills Section -->
             @if ($openBills->isNotEmpty())
                 <div class="bg-white rounded-xl shadow-md border border-gray-100">
@@ -63,7 +65,7 @@
                             <thead class="bg-amber-50 text-amber-800 text-sm leading-normal">
                                 <tr>
                                     <th class="p-3 font-bold rounded-tl-lg">Opened</th>
-                                    <th class="p-3 font-bold">Table</th>
+                                    <th class="p-3 font-bold">Name</th>
                                     <th class="p-3 font-bold">Items</th>
                                     <th class="p-3 font-bold">Total</th>
                                     <th class="p-3 font-bold">
@@ -79,7 +81,7 @@
                                     <tr class="hover:bg-amber-50/30 transition duration-150">
                                         <td class="p-3 text-xs">{{ $bill->opened_at?->format('d M H:i') ?? '-' }}</td>
                                         <td class="p-3">
-                                            <span class="font-bold text-gray-900">{{ $bill->chair->name ?? '-' }}</span>
+                                            <span class="font-bold text-gray-900">{{ $bill->customer_name ?? $bill->chair->name ?? '-' }}</span>
                                         </td>
                                         <td class="p-3 text-xs">
                                             @foreach ($bill->cartMenus as $cm)
@@ -115,7 +117,7 @@
                                                     class="openBillPay w-10 h-10 flex items-center justify-center bg-emerald-500 text-white rounded-lg shadow hover:bg-emerald-600 hover:scale-105 transition"
                                                     title="Pay" data-cart-id="{{ $bill->id }}"
                                                     data-total="{{ $bill->total_amount }}"
-                                                    data-chair="{{ $bill->chair->name ?? '-' }}">
+                                                    data-name="{{ $bill->customer_name ?? $bill->chair->name ?? '-' }}">
                                                     <i class="fas fa-money-bill-wave text-lg"></i>
                                                 </button>
                                                 <form
@@ -307,7 +309,7 @@
 
             <div class="px-8 pt-7 pb-5 border-b border-gray-100">
                 <h2 class="text-base font-semibold text-gray-500 uppercase tracking-wider">Collect Payment <span
-                        id="obChairLabel" class="text-gray-900 normal-case"></span></h2>
+                        id="obNameLabel" class="text-gray-900 normal-case"></span></h2>
                 <div class="mt-2 flex items-baseline gap-2">
                     <span class="text-sm text-gray-500">Total</span>
                     <span id="obTotalLabel" class="text-3xl font-bold text-gray-900 tabular-nums">Rp 0</span>
@@ -541,12 +543,12 @@
             $('.openBillPay').click(function() {
                 const cartId = $(this).data('cart-id');
                 const total = parseInt($(this).data('total')) || 0;
-                const chair = $(this).data('chair');
+                const name = $(this).data('name');
                 obTotal = total;
 
                 $('.obCartIdInput').val(cartId);
                 $('#obTotalLabel').text(formatRp(total));
-                $('#obChairLabel').text('Table ' + chair);
+                $('#obNameLabel').text(name);
                 $('#obCashReceived').val('');
                 $('#obChangeDisplay').text('Rp0').removeClass('text-red-600').addClass('text-gray-900');
                 $('#obCashWarning').addClass('hidden');

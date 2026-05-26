@@ -15,6 +15,7 @@ class StockMovement extends Model
         'invent_id',
         'user_id',
         'quantity',
+        'stock_before',
         'type',
         'reference_type',
         'reference_id',

@@ -14,6 +14,7 @@ class Cart extends Model
             'store_id',
             'user_id',
             'chair_id',
+            'customer_name',
             'total_amount',
             'expires_at',
             'is_open_bill',

@@ -8,6 +8,7 @@ use App\Models\Invent;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\StockMovement;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class InventoryService
@@ -59,7 +60,9 @@ class InventoryService
             return;
         }
 
-        DB::transaction(function () use ($order, $strict) {
+        $consumed = false;
+
+        DB::transaction(function () use ($order, $strict, &$consumed) {
             $order->loadMissing('cart.cartMenus.menu');
             $userId = auth()->id();
 
@@ -98,6 +101,7 @@ class InventoryService
 
             foreach ($needed as $inventId => $qty) {
                 $invent = $invents[$inventId];
+                $stockBefore = (int) $invent->stock;
                 $invent->decrement('stock', $qty);
 
                 StockMovement::create([
@@ -105,18 +109,28 @@ class InventoryService
                     'invent_id' => $invent->id,
                     'user_id' => $userId,
                     'quantity' => -$qty,
+                    'stock_before' => $stockBefore,
                     'type' => 'order_consume',
                     'reference_type' => Order::class,
                     'reference_id' => $order->id,
                     'notes' => "Order {$order->no_order}",
                 ]);
             }
+
+            $consumed = true;
         });
+
+        if ($consumed) {
+            $this->forgetStockCache($order->store_id);
+        }
     }
 
     public function restoreForOrder(Order $order)
     {
-        DB::transaction(function () use ($order) {
+        $restored = false;
+        $storeId = $order->store_id;
+
+        DB::transaction(function () use ($order, &$restored, &$storeId) {
             $userId = auth()->id();
 
             $movements = StockMovement::where('reference_type', Order::class)
@@ -127,20 +141,38 @@ class InventoryService
             foreach ($movements as $movement) {
                 $restoreQty = abs($movement->quantity);
 
-                Invent::where('id', $movement->invent_id)->increment('stock', $restoreQty);
+                $invent = Invent::where('id', $movement->invent_id)->first();
+                $stockBefore = $invent ? (int) $invent->stock : 0;
+                if ($invent) {
+                    $invent->increment('stock', $restoreQty);
+                }
 
                 StockMovement::create([
                     'store_id' => $movement->store_id,
                     'invent_id' => $movement->invent_id,
                     'user_id' => $userId,
                     'quantity' => $restoreQty,
+                    'stock_before' => $stockBefore,
                     'type' => 'order_restore',
                     'reference_type' => Order::class,
                     'reference_id' => $order->id,
                     'notes' => "Restore order {$order->no_order}",
                 ]);
+
+                $restored = true;
+                $storeId = $movement->store_id;
             }
         });
+
+        if ($restored) {
+            $this->forgetStockCache($storeId);
+        }
+    }
+
+    private function forgetStockCache(int $storeId): void
+    {
+        Cache::forget("stock_{$storeId}");
+        Cache::forget("invents_{$storeId}");
     }
 
     private function alreadyConsumed(Order $order): bool

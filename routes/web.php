@@ -73,6 +73,7 @@ Route::middleware(['auth:sanctum', 'ensure'])->group(function () {
     Route::post('/stock/receive', [StockController::class, 'receive'])->name('receiveinvent');
     Route::get('/stock/opname', [StockController::class, 'opnameForm'])->name('opname');
     Route::post('/stock/opname', [StockController::class, 'opname'])->name('opnameinvent');
+    Route::get('/stock/opname-history', [StockController::class, 'opnameHistory'])->name('opnameHistory');
 
 
     // ORDER CONTROLLER

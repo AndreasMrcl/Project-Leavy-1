@@ -15,10 +15,7 @@ class IngredientController extends Controller
 {
     public function index()
     {
-        $storeId = Auth::user()->store->id;
-        $cacheKey = "ingridient_{$storeId}";
-
-        $menus = Cache::remember($cacheKey, 180, fn () => Menu::with(['invents'])->get());
+        $menus = Menu::with(['invents'])->get();
 
         $invents = Invent::orderBy('name')->get();
 

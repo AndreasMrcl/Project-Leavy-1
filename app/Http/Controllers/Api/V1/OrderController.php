@@ -309,7 +309,7 @@ class OrderController extends Controller
             $history->store_id = $settlement->store_id;
             $history->no_order = $order->no_order;
             $history->akun = $order->cart->user->name ?? $order->cart->chair->name ?? '-';
-            $history->name = $order->atas_nama ?? '-';
+            $history->name = $order->cart->customer_name ?? $order->atas_nama ?? '-';
 
             $orderDetails = '';
             foreach ($order->cart->cartMenus as $cartMenu) {

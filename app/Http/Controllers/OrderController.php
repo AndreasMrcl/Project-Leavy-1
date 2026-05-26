@@ -26,7 +26,7 @@ class OrderController extends Controller
 
         $openBills = Cart::openBills()
             ->where('store_id', $userStore->id)
-            ->with(['chair', 'cartMenus.menu', 'cartMenus.discount'])
+            ->with(['cartMenus.menu', 'cartMenus.discount'])
             ->latest('opened_at')
             ->get();
 
@@ -98,7 +98,7 @@ class OrderController extends Controller
         $appendCart = null;
 
         if ($appendCartId) {
-            $appendCart = Cart::with('cartMenus.menu', 'cartMenus.discount', 'chair')
+            $appendCart = Cart::with('cartMenus.menu', 'cartMenus.discount')
                 ->where('id', $appendCartId)
                 ->where('store_id', $userStore->id)
                 ->where('is_open_bill', true)
@@ -129,14 +129,7 @@ class OrderController extends Controller
             $mode = 'new';
         }
 
-        $availableChairs = $userStore->chairs()
-            ->whereDoesntHave('carts', function ($q) {
-                $q->where('is_open_bill', true)->whereDoesntHave('orders');
-            })
-            ->orderBy('name')
-            ->get();
-
-        return view('ordercreate', compact('menus', 'discounts', 'cart', 'mode', 'availableChairs'));
+        return view('ordercreate', compact('menus', 'discounts', 'cart', 'mode'));
     }
 
     public function checkout(Request $request)
@@ -250,19 +243,11 @@ class OrderController extends Controller
         $userStore = $user->store;
 
         $data = $request->validate([
-            'chair_id' => 'required|exists:chairs,id',
+            'customer_name' => 'required|string|max:255',
             'cart_id' => 'nullable|integer',
         ]);
 
-        $chair = $userStore->chairs()->where('id', $data['chair_id'])->first();
-        if (! $chair) {
-            return redirect()->route('addorder')->with('error', 'Chair is not valid.');
-        }
-
-        $existingOpenBill = Cart::openBills()->where('chair_id', $chair->id)->exists();
-        if ($existingOpenBill) {
-            return redirect()->route('addorder')->with('error', 'Chair '.$chair->name.' already has an open bill.');
-        }
+        $customerName = trim($data['customer_name']);
 
         $cart = ! empty($data['cart_id'])
             ? Cart::where('id', $data['cart_id'])->where('store_id', $userStore->id)->first()
@@ -276,11 +261,11 @@ class OrderController extends Controller
             return redirect()->route('addorder')->with('error', 'Cart this already has an order, cannot be opened as a bill.');
         }
 
-        DB::transaction(function () use ($cart, $chair, $user, $userStore) {
+        DB::transaction(function () use ($cart, $customerName, $user, $userStore) {
             $cart->update([
                 'is_open_bill' => true,
                 'opened_at' => now(),
-                'chair_id' => $chair->id,
+                'customer_name' => $customerName,
                 'expires_at' => null,
             ]);
 
@@ -292,11 +277,11 @@ class OrderController extends Controller
 
         $this->logActivity(
             'Open Bill',
-            "Opening bill for chair: {$chair->name}",
+            "Opening bill for: {$customerName}",
             $userStore->id
         );
 
-        return redirect()->route('order')->with('success', 'Bill for chair '.$chair->name.' successfully opened.');
+        return redirect()->route('order')->with('success', 'Bill for '.$customerName.' successfully opened.');
     }
 
     public function cancelOpenBill($cartId)
@@ -313,7 +298,7 @@ class OrderController extends Controller
             return redirect()->route('order')->with('error', 'Open bill not found.');
         }
 
-        $cartChairName = $cart->chair?->name ?? 'unknown';
+        $cartLabel = $cart->customer_name ?? $cart->chair?->name ?? 'unknown';
 
         DB::transaction(function () use ($cart) {
             $cart->cartMenus()->delete();
@@ -323,7 +308,7 @@ class OrderController extends Controller
 
         $this->logActivity(
             'Cancel Open Bill',
-            "Canceling open bill for chair: {$cartChairName}",
+            "Canceling open bill for: {$cartLabel}",
             $userStore->id
         );
 
@@ -502,7 +487,7 @@ class OrderController extends Controller
             $history->store_id = $settlement->store_id;
             $history->no_order = $order->no_order;
             $history->akun = $order->cart->user->name ?? $order->cart->chair->name ?? '-';
-            $history->name = $order->atas_nama ?? '-';
+            $history->name = $order->cart->customer_name ?? $order->atas_nama ?? '-';
             $orderDetails = '';
 
             foreach ($order->cart->cartMenus as $cartMenu) {

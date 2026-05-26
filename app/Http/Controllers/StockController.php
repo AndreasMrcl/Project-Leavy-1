@@ -14,10 +14,7 @@ class StockController extends Controller
 {
     public function index()
     {
-        $storeId = Auth::user()->store->id;
-        $cacheKey = "stock_{$storeId}";
-
-        $invents = Cache::remember($cacheKey, 180, fn () => Invent::orderBy('name')->get());
+        $invents = Invent::orderBy('name')->get();
 
         return view('stok', compact('invents'));
     }
@@ -33,6 +30,7 @@ class StockController extends Controller
         $invent = Invent::findOrFail($data['invent_id']);
 
         DB::transaction(function () use ($invent, $data) {
+            $stockBefore = (int) $invent->stock;
             $invent->increment('stock', $data['quantity']);
 
             StockMovement::create([
@@ -40,6 +38,7 @@ class StockController extends Controller
                 'invent_id' => $invent->id,
                 'user_id' => Auth::id(),
                 'quantity' => $data['quantity'],
+                'stock_before' => $stockBefore,
                 'type' => 'receive',
                 'notes' => $data['notes'] ?? "Penerimaan {$invent->name}",
             ]);
@@ -58,12 +57,50 @@ class StockController extends Controller
 
     public function opnameForm()
     {
-        $storeId = Auth::user()->store->id;
-        $cacheKey = "stock_{$storeId}";
-
-        $invents = Cache::remember($cacheKey, 180, fn () => Invent::orderBy('name')->get());
+        $invents = Invent::orderBy('name')->get();
 
         return view('opname', compact('invents'));
+    }
+
+    public function opnameHistory(Request $request)
+    {
+        $storeId = Auth::user()->store->id;
+
+        $movements = StockMovement::where('store_id', $storeId)
+            ->where('type', 'manual_adjust')
+            ->with(['invent', 'user'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        // Group by session: same user, same notes, created within same second
+        $sessions = $movements
+            ->groupBy(fn ($m) => $m->created_at->format('Y-m-d H:i:s').'|'.($m->user_id ?? '0').'|'.($m->notes ?? ''))
+            ->map(function ($rows) {
+                $first = $rows->first();
+
+                return [
+                    'created_at' => $first->created_at,
+                    'user_name' => $first->user->name ?? '-',
+                    'reason' => $first->notes ?? '-',
+                    'items' => $rows->values(),
+                    'total_items' => $rows->count(),
+                    'total_increase' => $rows->where('quantity', '>', 0)->sum('quantity'),
+                    'total_decrease' => $rows->where('quantity', '<', 0)->sum('quantity'),
+                ];
+            })
+            ->values();
+
+        // Build "previous opname" map per invent for comparison.
+        $previousOpnameByInvent = [];
+        foreach ($movements->sortBy('created_at') as $m) {
+            $stockAfter = (int) ($m->stock_before ?? 0) + (int) $m->quantity;
+            $previousOpnameByInvent[$m->invent_id][] = [
+                'created_at' => $m->created_at,
+                'stock_after' => $stockAfter,
+            ];
+        }
+
+        return view('opnameHistory', compact('sessions', 'previousOpnameByInvent'));
     }
 
     public function opname(Request $request)
@@ -110,6 +147,7 @@ class StockController extends Controller
 
         DB::transaction(function () use ($changes, $data, $storeId) {
             foreach ($changes as $change) {
+                $stockBefore = (int) $change['invent']->stock;
                 $change['invent']->update(['stock' => $change['actual_stock']]);
 
                 StockMovement::create([
@@ -117,6 +155,7 @@ class StockController extends Controller
                     'invent_id' => $change['invent']->id,
                     'user_id' => Auth::id(),
                     'quantity' => $change['delta'],
+                    'stock_before' => $stockBefore,
                     'type' => 'manual_adjust',
                     'notes' => $data['reason'],
                 ]);
