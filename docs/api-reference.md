@@ -27,7 +27,7 @@ Dokumentasi API untuk aplikasi kasir mobile (Flutter). Audience: mobile develope
 
 ## Overview
 
-- **Base URL (dev)**: `http://localhost:8000`
+- **Base URL (dev)**: `http://genesa.bepos.id`
 - **Base URL (prod)**: TBA
 - **Versioning**: prefix `/api/v1/`
 - **Protocol**: HTTPS (prod), HTTP (dev)
@@ -722,7 +722,7 @@ Generate Excel export untuk bulan N (1-12). Server return **signed URL** untuk d
 ```json
 {
   "data": {
-    "url": "http://localhost:8000/api/v1/history/exports/history_5_aB12Xy9z.xlsx?signature=...&expires=...",
+    "url": "http://genesa.bepos.id/api/v1/history/exports/history_5_aB12Xy9z.xlsx?signature=...&expires=...",
     "expires_in": 600,
     "filename": "history_5_aB12Xy9z.xlsx"
   }

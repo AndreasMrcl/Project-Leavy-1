@@ -43,6 +43,11 @@ class Store extends Model
         return $this->hasMany(Chair::class);
     }
 
+    public function staffs()
+    {
+        return $this->hasMany(Staff::class);
+    }
+
     public function settlements()
     {
         return $this->hasMany(Settlement::class);

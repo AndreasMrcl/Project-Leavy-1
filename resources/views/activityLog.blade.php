@@ -87,13 +87,19 @@
                                             </span>
                                         </div>
                                         @php
-                                            $name = $log->user?->name ?? 'System';
+                                            $actor = $log->staff ?? $log->user;
+                                            $name = $actor?->name ?? 'System';
+                                            $roleLabel = $log->staff_id ? 'Staff' : ($log->user_id ? 'Admin' : 'System');
+                                            $actorId = $log->staff_id ?? $log->user_id ?? '-';
+                                            $avatarClass = $log->staff_id
+                                                ? 'bg-amber-100 text-amber-700'
+                                                : 'bg-indigo-100 text-indigo-600';
                                         @endphp
 
                                         <div
                                             class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg border border-gray-100 hover:bg-white hover:shadow-sm transition">
                                             <div
-                                                class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold shrink-0 uppercase shadow-sm">
+                                                class="w-8 h-8 rounded-full {{ $avatarClass }} flex items-center justify-center text-xs font-bold shrink-0 uppercase shadow-sm">
                                                 {{ strtoupper(substr($name, 0, 1)) }}
                                             </div>
 
@@ -104,7 +110,7 @@
                                                 </p>
 
                                                 <p class="text-[10px] text-gray-400 truncate">
-                                                    ID: #{{ $log->user_id ?? '-' }}
+                                                    {{ $roleLabel }} #{{ $actorId }}
                                                 </p>
                                             </div>
                                         </div>
@@ -175,7 +181,7 @@
     <script>
         $(document).ready(function() {
             let table = new DataTable('#myTable', {
-
+                order: []
             });
         });
     </script>

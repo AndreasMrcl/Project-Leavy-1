@@ -16,7 +16,7 @@ class ActivityLogController extends Controller
         $logs = Cache::remember(
             $cacheKey,
             180,
-            fn () => ActivityLog::with('user')->latest()->get()
+            fn () => ActivityLog::with(['user', 'staff'])->latest()->get()
         );
 
         return view('activityLog', compact('logs'));

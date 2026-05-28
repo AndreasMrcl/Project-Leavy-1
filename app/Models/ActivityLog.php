@@ -12,6 +12,7 @@ class ActivityLog extends Model
 
     protected $fillable = [
         'user_id',
+        'staff_id',
         'store_id',
         'activity_type',
         'description',
@@ -27,6 +28,11 @@ class ActivityLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
     }
 
     public function getCreatedAtFormattedAttribute()

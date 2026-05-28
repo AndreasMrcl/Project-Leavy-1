@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chair;
+use App\Models\Staff;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,31 +34,52 @@ class AuthController extends Controller
 
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string',
+            'password' => 'required',
         ]);
 
-        if (! Auth::attempt($request->only('email', 'password'))) {
-            return redirect()->route('login')
-                ->withErrors(['email' => 'These credentials do not match our records.']);
+        $credentials = $request->only('email', 'password');
+
+        // User Login
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+
+            if (! Auth::guard('web')->attempt($credentials)) {
+                return back()->withErrors(['email' => 'Email atau password salah']);
+            }
+
+            $request->session()->regenerate();
+
+            return redirect()->route('dashboard')->with('toast_success', 'Login Berhasil!');
         }
 
-        $request->session()->regenerate();
+        // Staff Login
+        $staff = Staff::where('email', $request->email)->first();
 
-        if (Auth::user() instanceof Chair) {
-            return redirect()->route('user-home');
+        if ($staff) {
+
+            if (! Auth::guard('staff')->attempt($credentials)) {
+                return back()->withErrors(['email' => 'Email atau password salah']);
+            }
+
+            $request->session()->regenerate();
+
+            return redirect()->route('dashboard')->with('toast_success', 'Login Berhasil!');
         }
 
-        return redirect()->route('dashboard')->with('toast_success', 'Login Berhasil!');
+        return back()->withErrors(['email' => 'Akun tidak ditemukan']);
     }
 
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
 
+        Auth::guard('staff')->logout();
+
         Auth::guard('chair')->logout();
 
         $request->session()->invalidate();
-        
+
         $request->session()->regenerateToken();
 
         return redirect()

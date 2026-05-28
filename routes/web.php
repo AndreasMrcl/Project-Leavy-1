@@ -33,7 +33,7 @@ Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });
 
-Route::middleware(['auth:sanctum', 'ensure'])->group(function () {
+Route::middleware(['auth:web,staff', 'ensure'])->group(function () {
     // ADMIN
 
     // PAGES CONTROLLER
@@ -164,7 +164,7 @@ Route::middleware(['auth:chair', 'ensure'])->group(function () {
     Route::get('/customer/payment', [CustomerOrderController::class, 'payment'])->name('user-payment');
 });
 
-// LOGOUT - works for both admin (web/sanctum) and chair
-Route::middleware(['auth:sanctum,chair'])->group(function () {
+// LOGOUT - works for admin (web), staff, and chair
+Route::middleware(['auth:web,staff,chair'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

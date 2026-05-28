@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityLog;
 use App\Models\Invent;
 use App\Models\InventMenu;
 use App\Models\Menu;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -96,14 +96,6 @@ class IngredientController extends Controller
 
     private function logActivity($type, $description, $storeId)
     {
-        ActivityLog::create([
-            'user_id'       => Auth::id(),
-            'store_id'      => $storeId,
-            'activity_type' => $type,
-            'description'   => $description,
-            'created_at'    => now(),
-        ]);
-
-        Cache::forget("activities_{$storeId}");
+        ActivityLogger::log($type, $description, $storeId);
     }
 }
